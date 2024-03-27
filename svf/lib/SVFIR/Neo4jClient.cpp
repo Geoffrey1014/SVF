@@ -1,4 +1,5 @@
 #include <Python.h>
+#include "Util/cJSON.h"
 #include "SVFIR/Neo4jClient.h"
 
 namespace SVF {
@@ -6,7 +7,7 @@ Neo4jClient:: Neo4jClient(const char* uri = "neo4j+s://4291d08d.databases.neo4j.
     // Initialize the Python interpreter
     Py_Initialize();
 
-    // Add the path to the Python module (/home/SVF-tools/SVF/neo4j-cpp/Neo4jClient.py)
+    // Add the path to the Python module
     PyObject* sys = PyImport_ImportModule("sys");
     PyObject* path = PyObject_GetAttrString(sys, "path");
     PyList_Append(path, PyUnicode_FromString("/home/weigang/SVF/svf/lib/SVFIR"));
@@ -55,9 +56,9 @@ Neo4jClient::~Neo4jClient() {
     Py_Finalize();
 }
 
-DbNode Neo4jClient::createNode(const char* graph_id, const char* nodetype, ...) {
-    // Create a new dictionary to store the node properties
+DbNode Neo4jClient::createNode(const char* graph_id, const char* node_type, ...) {
     printf("Neo4jClient::createNode\n");
+    // Create a new dictionary to store the node properties
     PyObject* properties = PyDict_New();
     if (properties == nullptr) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to create node properties dictionary");
@@ -69,17 +70,18 @@ DbNode Neo4jClient::createNode(const char* graph_id, const char* nodetype, ...) 
 
     // Write the key-value pairs to the properties dictionary
     va_list args; // All variable arguments passed from the function call
-    va_start(args, nodetype); // Start reading the variable arguments after the nodetype
+    va_start(args, node_type); // Start reading the variable arguments after the node_type
     const char* key;
     PyObject* value;
     while ((key = va_arg(args, const char*)) != nullptr) { // Read the key (use nullptr to mark the ends of the variable arguments list)
+        PyObject* pyKey = PyUnicode_FromString(key);
         value = va_arg(args, PyObject*); // Read the value
-        PyDict_SetItemString(properties, key, value); // Add the key-value pair to the properties dictionary
+        PyDict_SetItem(properties, pyKey, value); // Add the key-value pair to the properties dictionary
     }
     va_end(args);
 
     // Create a new Node object and return it
-    return DbNode(nodetype, properties);
+    return DbNode(node_type, properties);
 }
 
 DbEdge Neo4jClient::createEdge(const char* graph_id, const char* edge_type, ...) {
@@ -100,10 +102,89 @@ DbEdge Neo4jClient::createEdge(const char* graph_id, const char* edge_type, ...)
     const char* key;
     PyObject* value;
     while ((key = va_arg(args, const char*)) != nullptr) { // Read the key (use nullptr to mark the ends of the variable arguments list)
+        PyObject* pyKey = PyUnicode_FromString(key);
         value = va_arg(args, PyObject*); // Read the value
-        PyDict_SetItemString(properties, key, value); // Add the key-value pair to the properties dictionary
+        PyDict_SetItem(properties, pyKey, value); // Add the key-value pair to the properties dictionary
     }
     va_end(args);
+
+    // Create a new Node object and return it
+    return DbEdge(edge_type, properties);
+}
+
+DbNode Neo4jClient::createNodeJson(const char* graph_id, const char* node_type, cJSON* jsonNode) {
+    // Create a new dictionary to store the node properties
+    PyObject* properties = PyDict_New();
+    if (properties == nullptr) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create node properties dictionary");
+        PyErr_Print();
+    }
+
+    // Add graph_id to properties dictionary
+    PyDict_SetItemString(properties, "graph_id", PyUnicode_FromString(graph_id));
+
+    // Write the key-value pairs to the properties dictionary
+    cJSON* current_element = nullptr;
+    cJSON_ArrayForEach(current_element, jsonNode) {
+        PyObject* pyKey = PyUnicode_FromString(current_element->string);
+        if (cJSON_IsNumber(current_element)) { // Check if the current element is a number
+            PyDict_SetItem(properties, pyKey, PyLong_FromLong(current_element->valueint));
+        } else if (cJSON_IsString(current_element)) { // Check if the current element is a string
+            PyDict_SetItem(properties, pyKey, PyUnicode_FromString(current_element->valuestring));
+        } else if (cJSON_IsArray(current_element)) { // Check if the current element is an array
+            // Convert the C++ array to a Python list and adds to properties dictionary
+            int size = cJSON_GetArraySize(current_element);
+            PyObject* pyList = PyList_New(size);
+            for (int i = 0; i < size; i++) {
+                cJSON* item = cJSON_GetArrayItem(current_element, i);
+                if (cJSON_IsNumber(item)) {
+                    PyList_SetItem(pyList, i, PyLong_FromLong(item->valueint));
+                } else if (cJSON_IsString(item)) {
+                    PyList_SetItem(pyList, i, PyUnicode_FromString(item->valuestring));
+                }
+            }
+            PyDict_SetItem(properties, pyKey, pyList);
+        }
+    }
+
+    // Create a new Node object and return it
+    return DbNode(node_type, properties);
+}
+
+DbEdge Neo4jClient::createEdgeJson(const char* graph_id, const char* edge_type, cJSON* edgeJson) {
+    // Create a new dictionary to store the edge properties
+    PyObject* properties = PyDict_New();
+    if (properties == nullptr) {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create edge properties dictionary");
+        PyErr_Print();
+    }
+
+    // Add graph_id to properties dictionary
+    PyDict_SetItemString(properties, "graph_id", PyUnicode_FromString(graph_id));
+
+    // Write the key-value pairs to the properties dictionary
+    cJSON* current_element = nullptr;
+    cJSON_ArrayForEach(current_element, edgeJson) {
+        PyObject* pyKey = PyUnicode_FromString(current_element->string);
+        if (cJSON_IsNumber(current_element)) { // Check if the current element is a number
+            PyDict_SetItem(properties, pyKey, PyLong_FromLong(current_element->valueint));
+        } else if (cJSON_IsString(current_element)) { // Check if the current element is a string
+            PyDict_SetItem(properties, pyKey, PyUnicode_FromString(current_element->valuestring));
+        } else if (cJSON_IsArray(current_element)) { // Check if the current element is an array
+            // Convert the C++ array to a Python list and adds to properties dictionary
+            int size = cJSON_GetArraySize(current_element);
+            PyObject* pyList = PyList_New(size);
+            for (int i = 0; i < size; i++) {
+                cJSON* item = cJSON_GetArrayItem(current_element, i);
+                if (cJSON_IsNumber(item)) {
+                    PyList_SetItem(pyList, i, PyLong_FromLong(item->valueint));
+                } else if (cJSON_IsString(item)) {
+                    PyList_SetItem(pyList, i, PyUnicode_FromString(item->valuestring));
+                }
+            }
+            PyDict_SetItem(properties, pyKey, pyList);
+        }
+    }
 
     // Create a new Node object and return it
     return DbEdge(edge_type, properties);
@@ -112,10 +193,10 @@ DbEdge Neo4jClient::createEdge(const char* graph_id, const char* edge_type, ...)
 void Neo4jClient:: writeNode(const DbNode& node) {
     // Call create_node method
     PyObject* pResult = PyObject_CallMethod(pInstance, "create_node", "(sO)",
-                                            node.getNodetype(), node.getProperties());
+                                            node.getNodetype(), node.getNodeProperties());
     // Check if the call succeeded
     if (pResult == nullptr) {
-        PyErr_SetString(PyExc_RuntimeError, "Failed to call create_node method");
+        PyErr_SetString(PyExc_RuntimeError, "Failed to call create_node method in python module");
         PyErr_Print();
         return;
     }
@@ -124,9 +205,9 @@ void Neo4jClient:: writeNode(const DbNode& node) {
 void Neo4jClient::writeEdge(const DbNode& node1, const DbNode& node2, const DbEdge& edge) {
     // Call create_edge method
     PyObject* pResult = PyObject_CallMethod(pInstance, "create_edge", "(sOsOsO)",
-                                            node1.getNodetype(), node1.getProperties(),
-                                            node2.getNodetype(), node2.getProperties(),
-                                            edge.getEdgeType(), edge.getProperties());
+                                            node1.getNodetype(), node1.getNodeProperties(),
+                                            node2.getNodetype(), node2.getNodeProperties(),
+                                            edge.getEdgeType(), edge.getEdgeProperties());
     // Check if the call succeeded
     if (pResult == nullptr) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to call create_edge method");
@@ -153,7 +234,6 @@ DbItem*  Neo4jItemManager::itemCreateArray(){
     return item;
 }
 
-
 DbItem* Neo4jItemManager::itemCreateObject(){
     DbItem *item= new DbItem();
     if(item)
@@ -164,38 +244,4 @@ DbItem* Neo4jItemManager::itemCreateObject(){
 
 }
 
-
-
-// int main() {
-//     // Initialize the neo4j client
-//     Neo4jClient client;
-
-//     // Clear the neo4j database
-//     client.clearDatabase();
-
-//     const char* graph_id = "0";
-//     // Create node1
-//     // Call createNode to create a node object
-//     DbNode node1 = client.createNode(graph_id, "Person", "name", PyUnicode_FromString("Angle"), "age", PyLong_FromLong(35), nullptr);
-//     // Call writeNode to write node1 into database
-//     client.writeNode(node1);
-
-//     // Create node2
-//     // Call createNode to create a node object
-//     DbNode node2 = client.createNode(graph_id, "Person", "name", PyUnicode_FromString("Alice"), "age", PyLong_FromLong(25), nullptr);
-//     // Call writeNode to write node2 into database
-//     client.writeNode(node2);
-
-//     // Link node1 and node2
-//     // Call createEdge to create an edge object
-//     DbEdge edge = client.createEdge(graph_id, "KNOWS", nullptr);
-//     // Call writeEdge to write edge into database
-//     client.writeEdge(node1, node2, edge);
-    
-//     // Close the connection to neo4j database
-//     // This will be handled by the destructor of the Neo4jClient class
-
-//     return 0;
-// }
-
-} // namespace SVF
+}

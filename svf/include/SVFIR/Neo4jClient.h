@@ -24,6 +24,8 @@
 #include <Python.h>
 #include <string>
 #include <vector>
+#include "Util/cJSON.h"
+
 #ifndef INCLUDE_NEO4JCLIENT_H_
 #define INCLUDE_NEO4JCLIENT_H_
 
@@ -158,31 +160,31 @@ class DbItem{
 class DbNode : public DbItem{
     
 private:
-    const char* nodetype;
-    PyObject* properties;
+    const char* node_type;
+    PyObject* node_properties;
 
 public:
     // Constructor
-    DbNode(const char* nodetype, PyObject* properties) {
-        // Set the nodetype
-        this->nodetype = nodetype;
-        // Set the properties
-        this->properties = properties;
+    DbNode(const char* node_type, PyObject* node_properties) {
+        // Set the node_type
+        this->node_type = node_type;
+        // Set the node_properties
+        this->node_properties = node_properties;
     }
 
     // Destructor
     ~DbNode() {
-        Py_DECREF(properties);
+        Py_DECREF(node_properties);
     }
 
-    // Get the nodetype
+    // Get the node_type
     const char* getNodetype() const {
-        return nodetype;
+        return node_type;
     }
 
-    // Get the properties
-    PyObject* getProperties() const {
-        return properties;
+    // Get the node_properties
+    PyObject* getNodeProperties() const {
+        return node_properties;
     }
 };
 
@@ -212,7 +214,7 @@ public:
     }
 
     // Get the edge_properties
-    PyObject* getProperties() const {
+    PyObject* getEdgeProperties() const {
         return edge_properties;
     }
 };
@@ -228,9 +230,14 @@ public:
     // Destructor
     ~Neo4jClient();
 
-    DbNode createNode(const char* graph_id, const char* nodetype, ...);
+    DbNode createNodeJson(const char* graph_id, const char* node_type, cJSON* jsonNode);
+
+    DbNode createNode(const char* graph_id, const char* node_type, ...);
+
+    DbEdge createEdgeJson(const char* graph_id, const char* edge_type, cJSON* edgeJson);
 
     DbEdge createEdge(const char* graph_id, const char* edge_type, ...);
+
     void writeNode(const DbNode& node);
 
     void writeEdge(const DbNode& node1, const DbNode& node2, const DbEdge& edge);

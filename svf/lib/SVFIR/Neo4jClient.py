@@ -2,7 +2,7 @@
 """
 Created on Mon Mar 11 12:41:50 2024
 
-@author: Ruijun Feng
+@author: Android12138
 """
 
 from neo4j import GraphDatabase
@@ -24,50 +24,50 @@ class Neo4jClient:
         with self._driver.session() as session:
             session.run("MATCH (n) DETACH DELETE n")
 
-    def create_node(self, nodetype, properties):
+    def create_node(self, node_type, node_properties):
         '''
         Creating a node.
-        nodetyep specifies the type of node and properties specifies the attributes of the node.
+        node_type specifies the type of node and node_properties specifies the attributes of the node.
         '''
         with self._driver.session() as session:
             session.execute_write(self._create_node, 
-                                  nodetype, 
-                                  properties)
+                                  node_type, 
+                                  node_properties)
 
     @staticmethod
-    def _create_node(tx, nodetype, properties):
+    def _create_node(tx, node_type, node_properties):
         '''
         Formatting the query for creating a node.
         '''
         query = (
-            f"CREATE (n:{nodetype} {Neo4jClient._format_properties(properties)})"
+            f"CREATE (n:{node_type} {Neo4jClient._format_properties(node_properties)})"
         )
         tx.run(query)
 
-    def create_edge(self, nodetype1, properties1, nodetype2, properties2, edge_type, edge_properties):
+    def create_edge(self, node_type1, node_properties1, node_type2, node_properties2, edge_type, edge_properties):
         '''
         Creating a edge between two nodes.
         '''
         with self._driver.session() as session:
             session.execute_write(
                 self._create_edge,
-                nodetype1,
-                properties1,
-                nodetype2,
-                properties2,
+                node_type1,
+                node_properties1,
+                node_type2,
+                node_properties2,
                 edge_type,
                 edge_properties
             )
 
     @staticmethod
-    def _create_edge(tx, nodetype1, properties1, nodetype2, properties2, edge_type, edge_properties):
+    def _create_edge(tx, node_type1, node_properties1, node_type2, node_properties2, edge_type, edge_properties):
         '''
         Formatting a query for creating a edge between two nodes.
-        nodetype and properties are used to identify the nodes and edge_type is used to identify the relationship between the nodes.
+        node_type and node_properties are used to identify the nodes and edge_type is used to identify the relationship between the nodes.
         '''
         query = (
-            f"MATCH (node1:{nodetype1} {Neo4jClient._format_properties(properties1)}), "
-            f"(node2:{nodetype2} {Neo4jClient._format_properties(properties2)}) "
+            f"MATCH (node1:{node_type1} {Neo4jClient._format_properties(node_properties1)}), "
+            f"(node2:{node_type2} {Neo4jClient._format_properties(node_properties2)}) "
             f"CREATE (node1)-[:{edge_type} {Neo4jClient._format_properties(edge_properties)}]->(node2)"
         )
         tx.run(query)
@@ -118,18 +118,18 @@ if __name__ == "__main__":
     
     # Create a node
     graph_id = "1"
-    client.create_node(nodetype = "Person", 
-                       properties = {"name": "Alice", "age": 30, "graph_id": graph_id})
+    client.create_node(node_type = "Person", 
+                       node_properties = {"name": "Alice", "age": 30, "graph_id": graph_id})
     
     # Create another node
-    client.create_node(nodetype = "Person", 
-                       properties = {"name": "Bob", "age": 35, "graph_id": graph_id})
+    client.create_node(node_type = "Person", 
+                       node_properties = {"name": "Bob", "age": 35, "graph_id": graph_id})
     
-    # Create a edge between nodes
-    client.create_edge(nodetype1 = "Person", 
-                       properties1 = {"name": "Alice", "graph_id": graph_id}, 
-                       nodetype2 = "Person", 
-                       properties2 = {"name": "Bob", "graph_id": graph_id}, 
+    # Create a relationship between nodes
+    client.create_edge(node_type1 = "Person", 
+                       node_properties1 = {"name": "Alice", "graph_id": graph_id}, 
+                       node_type2 = "Person", 
+                       node_properties2 = {"name": "Bob", "graph_id": graph_id}, 
                        edge_type = "KNOWS", 
                        edge_properties = {"graph_id": graph_id, "since": "2022-01-01"})
 
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     print("Edges:")
     for record in edge_result:
         print(f"Edge: {record['r']}")
-        print(f"Properties: {record['props']}")
+        print(f"Edge Properties: {record['props']}")
         print(f"From: {record['a']}")
         print(f"To: {record['b']}")
 
