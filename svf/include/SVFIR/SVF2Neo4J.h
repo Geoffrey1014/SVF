@@ -31,32 +31,6 @@
 #include "SVFIR/Neo4jClient.h"
 
 
-#define ABORT_MSG(reason)                                                      \
-    do                                                                         \
-    {                                                                          \
-        SVFUtil::errs() << __FILE__ << ':' << __LINE__ << ": " << reason       \
-                        << '\n';                                               \
-        abort();                                                               \
-    } while (0)
-#define ABORT_IFNOT(condition, reason)                                         \
-    do                                                                         \
-    {                                                                          \
-        if (!(condition))                                                      \
-            ABORT_MSG(reason);                                                 \
-    } while (0)
-
-
-#define FIELD_NAME_ITEM(field) #field, (field)
-
-#define ITEM_FIELD_OR(item, field, default) ((item) ? (item)->field : default)
-#define ITEM_KEY(item) ITEM_FIELD_OR(item, string, "NULL")
-#define ITEM_CHILD(item) JSON_FIELD_OR(item, child, nullptr)
-
-#define ITEM_WRITE_FIELD(root, objptr, field)                                  \
-    itemAddItemableToObject(root, #field, (objptr)->field)
-
-#define CITEM_PUBLIC(type) type
-
 namespace SVF
 {
 /// @brief Forward declarations.
@@ -160,83 +134,6 @@ class CHGraph;
 // End of forward declarations
 ///@}
 
-#include <stddef.h>
-
-/* cITEM Types: */
-#define cITEM_Invalid (0)
-#define cITEM_False  (1 << 0)
-#define cITEM_True   (1 << 1)
-#define cITEM_NULL   (1 << 2)
-#define cITEM_Number (1 << 3)
-#define cITEM_String (1 << 4)
-#define cITEM_Array  (1 << 5)
-#define cITEM_Object (1 << 6)
-#define cITEM_Raw    (1 << 7) /* raw item */
-/* The cITEM structure: */
-typedef struct cITEM
-{
-    /* next/prev allow you to walk array/object chains. */
-    struct cITEM *next;
-    struct cITEM *prev;
-    /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
-    struct cITEM *child;
-
-    /* The type of the item, as above. */
-    int type;
-
-    /* The item's string, if type==cITEM_String and type == cITEM_Raw */
-    char *valuestring;
-    /* writing to valueint is DEPRECATED, use cITEM_SetNumberValue instead */
-    int valueint;
-    /* The item's number, if type==cITEM_Number */
-    double valuedouble;
-
-    /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
-    char *string;
-} cITEM;
-
-/* Delete a cITEM entity and all subentities. */
-CITEM_PUBLIC(void) cITEM_Delete(cITEM *item);
-/* malloc/free objects using the malloc/free functions that have been set with cJSON_InitHooks */
-CITEM_PUBLIC(void *) cITEM_malloc(size_t size);
-CITEM_PUBLIC(void) cITEM_free(void *object);
-
-/* Render a cJSON entity to text for transfer/storage. */
-CITEM_PUBLIC(char *) cITEM_Print(const cITEM *item);
-
-/* raw json */
-CITEM_PUBLIC(cITEM *) cITEM_CreateRaw(const char *raw);
-CITEM_PUBLIC(cITEM *) cITEM_CreateArray(void);
-CITEM_PUBLIC(cITEM *) cITEM_CreateObject(void);
-
-bool itemIsBool(const cITEM* item);
-bool itemIsBool(const cITEM* item, bool& flag);
-bool itemIsNumber(const cITEM* item);
-bool itemIsString(const cITEM* item);
-bool itemIsNullId(const cITEM* item);
-bool itemIsArray(const cITEM* item);
-bool itemIsMap(const cITEM* item);
-bool itemIsObject(const cITEM* item);
-bool itemKeyEquals(const cITEM* item, const char* key);
-std::pair<const cITEM*, const cITEM*> itemUnpackPair(const cITEM* item);
-double itemGetNumber(const cITEM* item);
-cITEM* itemCreateNullId();
-cITEM* itemCreateObject();
-cITEM* itemCreateArray();
-cITEM* itemCreateString(const char* str);
-cITEM* itemCreateIndex(size_t index);
-cITEM* itemCreateBool(bool flag);
-cITEM* itemCreateNumber(double num);
-bool itemAddPairToMap(cITEM* obj, cITEM* key, cITEM* value);
-bool itemAddItemToObject(cITEM* obj, const char* name, cITEM* item);
-bool itemAddItemToArray(cITEM* array, cITEM* item);
-/// @brief Helper function to write a number to a ITEM object.
-bool itemAddNumberToObject(cITEM* obj, const char* name, double number);
-bool itemAddStringToObject(cITEM* obj, const char* name, const char* str);
-bool itemAddStringToObject(cITEM* obj, const char* name, const std::string& s);
-#define itemForEach(field, array)                                              \
-    for (const cITEM* field = ITEM_CHILD(array); field; field = field->next)
-
 /// @brief Bookkeeping class to keep track of the IDs of objects that doesn't
 /// have any ID. E.g., SVFValue, XXXEdge.
 /// @tparam T
@@ -338,7 +235,7 @@ using GenericICFGDbWriter = GenericGraphDbWriter<ICFGNode, ICFGEdge>;
 
 class ICFGDbWriter : public GenericICFGDbWriter
 {
-    friend class SVFIRWriter;
+    friend class SVFIRDbWriter;
 
 private:
     WriterDbPtrPool<SVFLoop> svfLoopPool;
@@ -357,7 +254,7 @@ using CHGraphDbWriter = GenericGraphDbWriter<CHNode, CHEdge>;
 
 class SVFModuleDbWriter
 {
-    friend class SVFIRWriter;
+    friend class SVFIRDbWriter;
 
 private:
     WriterDbPtrPool<SVFType> svfTypePool;
@@ -400,11 +297,12 @@ private:
     CHGraphDbWriter chgWriter;
     IRGraphDbWriter irGraphWriter;
     Neo4jClient* db;
+    Neo4jItemManager* neo4jItemManager;
 
     OrderedMap<size_t, std::string> numToStrMap;
 
 public:
-    using autoITEM = std::unique_ptr<cITEM, decltype(&cITEM_Delete)>;
+    using autoITEM = std::unique_ptr<DbItem>;
     // using autoCStr = std::unique_ptr<char, decltype(&cITEM_free)>;
 
     /// @brief Constructor.
@@ -419,140 +317,140 @@ private:
 
     const char* numToStr(size_t n);
 
-    cITEM* toItem(const NodeIDAllocator* nodeIDAllocator);
-    cITEM* toItem(const SymbolTableInfo* symTable);
-    cITEM* toItem(const SVFModule* module);
-    cITEM* toItem(const SVFType* type);
-    cITEM* toItem(const SVFValue* value);
-    cITEM* toItem(const IRGraph* graph);       // IRGraph Graph
-    cITEM* toItem(const SVFVar* var);          // IRGraph Node
-    cITEM* toItem(const SVFStmt* stmt);        // IRGraph Edge
-    cITEM* toItem(const ICFG* icfg);           // ICFG Graph
-    cITEM* toItem(const ICFGNode* node);       // ICFG Node
-    cITEM* toItem(const ICFGEdge* edge);       // ICFG Edge
-    cITEM* toItem(const CommonCHGraph* graph); // CHGraph Graph
-    cITEM* toItem(const CHGraph* graph);       // CHGraph Graph
-    cITEM* toItem(const CHNode* node);         // CHGraph Node
-    cITEM* toItem(const CHEdge* edge);         // CHGraph Edge
+    DbItem* toItem(const NodeIDAllocator* nodeIDAllocator);
+    DbItem* toItem(const SymbolTableInfo* symTable);
+    DbItem* toItem(const SVFModule* module);
+    DbItem* toItem(const SVFType* type);
+    DbItem* toItem(const SVFValue* value);
+    DbItem* toItem(const IRGraph* graph);       // IRGraph Graph
+    DbItem* toItem(const SVFVar* var);          // IRGraph Node
+    DbItem* toItem(const SVFStmt* stmt);        // IRGraph Edge
+    DbItem* toItem(const ICFG* icfg);           // ICFG Graph
+    DbItem* toItem(const ICFGNode* node);       // ICFG Node
+    DbItem* toItem(const ICFGEdge* edge);       // ICFG Edge
+    DbItem* toItem(const CommonCHGraph* graph); // CHGraph Graph
+    DbItem* toItem(const CHGraph* graph);       // CHGraph Graph
+    DbItem* toItem(const CHNode* node);         // CHGraph Node
+    DbItem* toItem(const CHEdge* edge);         // CHGraph Edge
 
-    cITEM* toItem(const CallSite& cs);
-    cITEM* toItem(const AccessPath& ap);
-    cITEM* toItem(const SVFLoop* loop);
-    cITEM* toItem(const MemObj* memObj);
-    cITEM* toItem(const ObjTypeInfo* objTypeInfo);  // Only owned by MemObj
-    cITEM* toItem(const SVFLoopAndDomInfo* ldInfo); // Only owned by SVFFunction
-    cITEM* toItem(const StInfo* stInfo);
+    DbItem* toItem(const CallSite& cs);
+    DbItem* toItem(const AccessPath& ap);
+    DbItem* toItem(const SVFLoop* loop);
+    DbItem* toItem(const MemObj* memObj);
+    DbItem* toItem(const ObjTypeInfo* objTypeInfo);  // Only owned by MemObj
+    DbItem* toItem(const SVFLoopAndDomInfo* ldInfo); // Only owned by SVFFunction
+    DbItem* toItem(const StInfo* stInfo);
 
     // No need for 'toItem(short)' because of promotion to int
-    static cITEM* toItem(bool flag);
-    static cITEM* toItem(unsigned number);
-    static cITEM* toItem(int number);
-    static cITEM* toItem(float number);
-    static cITEM* toItem(const std::string& str);
-    cITEM* toItem(unsigned long number);
-    cITEM* toItem(long long number);
-    cITEM* toItem(unsigned long long number);
+    DbItem* toItem(bool flag);
+    DbItem* toItem(unsigned number);
+    DbItem* toItem(int number);
+    DbItem* toItem(float number);
+    DbItem* toItem(const std::string& str);
+    DbItem* toItem(unsigned long number);
+    DbItem* toItem(long long number);
+    DbItem* toItem(unsigned long long number);
 
     /// \brief Parameter types of these functions are all pointers.
     /// When they are used as arguments of toItem(), they will be
     /// dumped as an index. `contentToItem()` will dump the actual content.
     ///@{
-    cITEM* virtToItem(const SVFType* type);
-    cITEM* virtToItem(const SVFValue* value);
-    cITEM* virtToItem(const SVFVar* var);
-    cITEM* virtToItem(const SVFStmt* stmt);
-    cITEM* virtToItem(const ICFGNode* node);
-    cITEM* virtToItem(const ICFGEdge* edge);
-    cITEM* virtToItem(const CHNode* node);
-    cITEM* virtToItem(const CHEdge* edge);
+    DbItem* virtToItem(const SVFType* type);
+    DbItem* virtToItem(const SVFValue* value);
+    DbItem* virtToItem(const SVFVar* var);
+    DbItem* virtToItem(const SVFStmt* stmt);
+    DbItem* virtToItem(const ICFGNode* node);
+    DbItem* virtToItem(const ICFGEdge* edge);
+    DbItem* virtToItem(const CHNode* node);
+    DbItem* virtToItem(const CHEdge* edge);
 
     // Classes inherited from SVFVar
-    cITEM* contentToItem(const SVFVar* var);
-    cITEM* contentToItem(const ValVar* var);
-    cITEM* contentToItem(const ObjVar* var);
-    cITEM* contentToItem(const GepValVar* var);
-    cITEM* contentToItem(const GepObjVar* var);
-    cITEM* contentToItem(const FIObjVar* var);
-    cITEM* contentToItem(const RetPN* var);
-    cITEM* contentToItem(const VarArgPN* var);
-    cITEM* contentToItem(const DummyValVar* var);
-    cITEM* contentToItem(const DummyObjVar* var);
+    DbItem* contentToItem(const SVFVar* var);
+    DbItem* contentToItem(const ValVar* var);
+    DbItem* contentToItem(const ObjVar* var);
+    DbItem* contentToItem(const GepValVar* var);
+    DbItem* contentToItem(const GepObjVar* var);
+    DbItem* contentToItem(const FIObjVar* var);
+    DbItem* contentToItem(const RetPN* var);
+    DbItem* contentToItem(const VarArgPN* var);
+    DbItem* contentToItem(const DummyValVar* var);
+    DbItem* contentToItem(const DummyObjVar* var);
 
     // Classes inherited from SVFStmt
-    cITEM* contentToItem(const SVFStmt* edge);
-    cITEM* contentToItem(const AssignStmt* edge);
-    cITEM* contentToItem(const AddrStmt* edge);
-    cITEM* contentToItem(const CopyStmt* edge);
-    cITEM* contentToItem(const StoreStmt* edge);
-    cITEM* contentToItem(const LoadStmt* edge);
-    cITEM* contentToItem(const GepStmt* edge);
-    cITEM* contentToItem(const CallPE* edge);
-    cITEM* contentToItem(const RetPE* edge);
-    cITEM* contentToItem(const MultiOpndStmt* edge);
-    cITEM* contentToItem(const PhiStmt* edge);
-    cITEM* contentToItem(const SelectStmt* edge);
-    cITEM* contentToItem(const CmpStmt* edge);
-    cITEM* contentToItem(const BinaryOPStmt* edge);
-    cITEM* contentToItem(const UnaryOPStmt* edge);
-    cITEM* contentToItem(const BranchStmt* edge);
-    cITEM* contentToItem(const TDForkPE* edge);
-    cITEM* contentToItem(const TDJoinPE* edge);
+    DbItem* contentToItem(const SVFStmt* edge);
+    DbItem* contentToItem(const AssignStmt* edge);
+    DbItem* contentToItem(const AddrStmt* edge);
+    DbItem* contentToItem(const CopyStmt* edge);
+    DbItem* contentToItem(const StoreStmt* edge);
+    DbItem* contentToItem(const LoadStmt* edge);
+    DbItem* contentToItem(const GepStmt* edge);
+    DbItem* contentToItem(const CallPE* edge);
+    DbItem* contentToItem(const RetPE* edge);
+    DbItem* contentToItem(const MultiOpndStmt* edge);
+    DbItem* contentToItem(const PhiStmt* edge);
+    DbItem* contentToItem(const SelectStmt* edge);
+    DbItem* contentToItem(const CmpStmt* edge);
+    DbItem* contentToItem(const BinaryOPStmt* edge);
+    DbItem* contentToItem(const UnaryOPStmt* edge);
+    DbItem* contentToItem(const BranchStmt* edge);
+    DbItem* contentToItem(const TDForkPE* edge);
+    DbItem* contentToItem(const TDJoinPE* edge);
 
     // Classes inherited from ICFGNode
-    cITEM* contentToItem(const ICFGNode* node);
-    cITEM* contentToItem(const GlobalICFGNode* node);
-    cITEM* contentToItem(const IntraICFGNode* node);
-    cITEM* contentToItem(const InterICFGNode* node);
-    cITEM* contentToItem(const FunEntryICFGNode* node);
-    cITEM* contentToItem(const FunExitICFGNode* node);
-    cITEM* contentToItem(const CallICFGNode* node);
-    cITEM* contentToItem(const RetICFGNode* node);
+    DbItem* contentToItem(const ICFGNode* node);
+    DbItem* contentToItem(const GlobalICFGNode* node);
+    DbItem* contentToItem(const IntraICFGNode* node);
+    DbItem* contentToItem(const InterICFGNode* node);
+    DbItem* contentToItem(const FunEntryICFGNode* node);
+    DbItem* contentToItem(const FunExitICFGNode* node);
+    DbItem* contentToItem(const CallICFGNode* node);
+    DbItem* contentToItem(const RetICFGNode* node);
 
     // Classes inherited from ICFGEdge
-    cITEM* contentToItem(const ICFGEdge* edge);
-    cITEM* contentToItem(const IntraCFGEdge* edge);
-    cITEM* contentToItem(const CallCFGEdge* edge);
-    cITEM* contentToItem(const RetCFGEdge* edge);
+    DbItem* contentToItem(const ICFGEdge* edge);
+    DbItem* contentToItem(const IntraCFGEdge* edge);
+    DbItem* contentToItem(const CallCFGEdge* edge);
+    DbItem* contentToItem(const RetCFGEdge* edge);
 
     // CHNode & CHEdge
-    cITEM* contentToItem(const CHNode* node);
-    cITEM* contentToItem(const CHEdge* edge);
+    DbItem* contentToItem(const CHNode* node);
+    DbItem* contentToItem(const CHEdge* edge);
 
-    cITEM* contentToItem(const SVFType* type);
-    cITEM* contentToItem(const SVFPointerType* type);
-    cITEM* contentToItem(const SVFIntegerType* type);
-    cITEM* contentToItem(const SVFFunctionType* type);
-    cITEM* contentToItem(const SVFStructType* type);
-    cITEM* contentToItem(const SVFArrayType* type);
-    cITEM* contentToItem(const SVFOtherType* type);
+    DbItem* contentToItem(const SVFType* type);
+    DbItem* contentToItem(const SVFPointerType* type);
+    DbItem* contentToItem(const SVFIntegerType* type);
+    DbItem* contentToItem(const SVFFunctionType* type);
+    DbItem* contentToItem(const SVFStructType* type);
+    DbItem* contentToItem(const SVFArrayType* type);
+    DbItem* contentToItem(const SVFOtherType* type);
 
-    cITEM* contentToItem(const SVFValue* value);
-    cITEM* contentToItem(const SVFFunction* value);
-    cITEM* contentToItem(const SVFBasicBlock* value);
-    cITEM* contentToItem(const SVFInstruction* value);
-    cITEM* contentToItem(const SVFCallInst* value);
-    cITEM* contentToItem(const SVFVirtualCallInst* value);
-    cITEM* contentToItem(const SVFConstant* value);
-    cITEM* contentToItem(const SVFGlobalValue* value);
-    cITEM* contentToItem(const SVFArgument* value);
-    cITEM* contentToItem(const SVFConstantData* value);
-    cITEM* contentToItem(const SVFConstantInt* value);
-    cITEM* contentToItem(const SVFConstantFP* value);
-    cITEM* contentToItem(const SVFConstantNullPtr* value);
-    cITEM* contentToItem(const SVFBlackHoleValue* value);
-    cITEM* contentToItem(const SVFOtherValue* value);
-    cITEM* contentToItem(const SVFMetadataAsValue* value);
+    DbItem* contentToItem(const SVFValue* value);
+    DbItem* contentToItem(const SVFFunction* value);
+    DbItem* contentToItem(const SVFBasicBlock* value);
+    DbItem* contentToItem(const SVFInstruction* value);
+    DbItem* contentToItem(const SVFCallInst* value);
+    DbItem* contentToItem(const SVFVirtualCallInst* value);
+    DbItem* contentToItem(const SVFConstant* value);
+    DbItem* contentToItem(const SVFGlobalValue* value);
+    DbItem* contentToItem(const SVFArgument* value);
+    DbItem* contentToItem(const SVFConstantData* value);
+    DbItem* contentToItem(const SVFConstantInt* value);
+    DbItem* contentToItem(const SVFConstantFP* value);
+    DbItem* contentToItem(const SVFConstantNullPtr* value);
+    DbItem* contentToItem(const SVFBlackHoleValue* value);
+    DbItem* contentToItem(const SVFOtherValue* value);
+    DbItem* contentToItem(const SVFMetadataAsValue* value);
 
     // Other classes
-    cITEM* contentToItem(const SVFLoop* loop);
-    cITEM* contentToItem(const MemObj* memObj); // Owned by SymbolTable->objMap
-    cITEM* contentToItem(const StInfo* stInfo);
+    DbItem* contentToItem(const SVFLoop* loop);
+    DbItem* contentToItem(const MemObj* memObj); // Owned by SymbolTable->objMap
+    DbItem* contentToItem(const StInfo* stInfo);
     ///@}
 
     template <typename NodeTy, typename EdgeTy>
-    cITEM* genericNodeToJson(const GenericNode<NodeTy, EdgeTy>* node)
+    DbItem* genericNodeToDb(const GenericNode<NodeTy, EdgeTy>* node)
     {
-        cITEM* root = itemCreateObject();
+        DbItem* root = neo4jItemManager->itemCreateObject();
         ITEM_WRITE_FIELD(root, node, id);
         ITEM_WRITE_FIELD(root, node, nodeKind);
         ITEM_WRITE_FIELD(root, node, InEdges);
@@ -561,9 +459,9 @@ private:
     }
 
     template <typename NodeTy>
-    cITEM* genericEdgeToJson(const GenericEdge<NodeTy>* edge)
+    DbItem* genericEdgeToDb(const GenericEdge<NodeTy>* edge)
     {
-        cITEM* root = itemCreateObject();
+        DbItem* root = neo4jItemManager->itemCreateObject();
         ITEM_WRITE_FIELD(root, edge, edgeFlag);
         ITEM_WRITE_FIELD(root, edge, src);
         ITEM_WRITE_FIELD(root, edge, dst);
@@ -571,30 +469,32 @@ private:
     }
 
     template <typename NodeTy, typename EdgeTy>
-    cITEM* genericGraphToJson(const GenericGraph<NodeTy, EdgeTy>* graph,
+    DbItem* genericGraphToDb(const GenericGraph<NodeTy, EdgeTy>* graph,
                               const std::vector<const EdgeTy*>& edgePool)
     {
-        cITEM* root = itemCreateObject();
+        DbItem* root = neo4jItemManager->itemCreateObject();
 
-        cITEM* allNode = itemCreateArray();
+        DbItem* allNode = neo4jItemManager->itemCreateArray();
         for (const auto& pair : graph->IDToNodeMap)
         {
             NodeTy* node = pair.second;
-            cITEM* itemNode = virtToItem(node);
-            itemAddItemToArray(allNode, itemNode);
+            
+            DbItem* itemNode = virtToItem(node);
+            itemNode->printItem();
+            // neo4jItemManager->itemAddItemToArray(allNode, itemNode);
         }
 
-        cITEM* allEdge = itemCreateArray();
+        DbItem* allEdge = neo4jItemManager->itemCreateArray();
         for (const EdgeTy* edge : edgePool)
-        {
-            cITEM* edgeJson = virtToItem(edge);
-            itemAddItemToArray(allEdge, edgeJson);
+        {   printf("EdgeTy: %p\n", edge);
+            // DbItem* edgeDb = virtToItem(edge);
+            // neo4jItemManager->itemAddItemToArray(allEdge, edgeDb);
         }
 
         ITEM_WRITE_FIELD(root, graph, nodeNum);
-        itemAddItemToObject(root, FIELD_NAME_ITEM(allNode));
+        neo4jItemManager->itemAddItemToObject(root, FIELD_NAME_ITEM(allNode));
         ITEM_WRITE_FIELD(root, graph, edgeNum);
-        itemAddItemToObject(root, FIELD_NAME_ITEM(allEdge));
+        neo4jItemManager->itemAddItemToObject(root, FIELD_NAME_ITEM(allEdge));
 
         return root;
     }
@@ -608,9 +508,9 @@ private:
      * without much space overhead.
 
     template <unsigned ElementSize>
-    cITEM* toItem(const SparseBitVectorElement<ElementSize>& element)
+    DbItem* toItem(const SparseBitVectorElement<ElementSize>& element)
     {
-        cITEM* array = itemCreateArray();
+        DbItem* array = itemCreateArray();
         for (const auto v : element.Bits)
         {
             itemAddItemToArray(array, toItem(v));
@@ -619,45 +519,45 @@ private:
     }
 
     template <unsigned ElementSize>
-    cITEM* toItem(const SparseBitVector<ElementSize>& bv)
+    DbItem* toItem(const SparseBitVector<ElementSize>& bv)
     {
         return toItem(bv.Elements);
     }
     */
 
-    template <typename T, typename U> cITEM* toItem(const std::pair<T, U>& pair)
+    template <typename T, typename U> DbItem* toItem(const std::pair<T, U>& pair)
     {
-        cITEM* obj = itemCreateArray();
-        itemAddItemToArray(obj, toItem(pair.first));
-        itemAddItemToArray(obj, toItem(pair.second));
+        DbItem* obj = neo4jItemManager->itemCreateArray();
+        neo4jItemManager->itemAddItemToArray(obj, toItem(pair.first));
+        neo4jItemManager->itemAddItemToArray(obj, toItem(pair.second));
         return obj;
     }
 
     template <typename T,
               typename = std::enable_if_t<SVFUtil::is_iterable_v<T>>>
-                                          cITEM* toItem(const T& container)
+                                          DbItem* toItem(const T& container)
     {
-        cITEM* array = itemCreateArray();
+        DbItem* array = neo4jItemManager->itemCreateArray();
         for (const auto& item : container)
         {
-            cITEM* itemObj = toItem(item);
-            itemAddItemToArray(array, itemObj);
+            DbItem* itemObj = toItem(item);
+            neo4jItemManager->itemAddItemToArray(array, itemObj);
         }
         return array;
     }
 
     template <typename T>
-    bool itemAddItemableToObject(cITEM* obj, const char* name, const T& item)
+    bool itemAddItemableToObject(DbItem* obj, const char* name, const T& item)
     {
-        cITEM* itemObj = toItem(item);
-        return itemAddItemToObject(obj, name, itemObj);
+        DbItem* itemObj = toItem(item);
+        return neo4jItemManager->itemAddItemToObject(obj, name, itemObj);
     }
 
     template <typename T>
-    bool itemAddContentToObject(cITEM* obj, const char* name, const T& item)
+    bool itemAddContentToObject(DbItem* obj, const char* name, const T& item)
     {
-        cITEM* itemObj = contentToItem(item);
-        return itemAddItemToObject(obj, name, itemObj);
+        DbItem* itemObj = contentToItem(item);
+        return neo4jItemManager->itemAddItemToObject(obj, name, itemObj);
     }
 };
 

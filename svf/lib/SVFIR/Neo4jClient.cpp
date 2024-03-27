@@ -57,6 +57,7 @@ Neo4jClient::~Neo4jClient() {
 
 DbNode Neo4jClient::createNode(const char* graph_id, const char* nodetype, ...) {
     // Create a new dictionary to store the node properties
+    printf("Neo4jClient::createNode\n");
     PyObject* properties = PyDict_New();
     if (properties == nullptr) {
         PyErr_SetString(PyExc_RuntimeError, "Failed to create node properties dictionary");
@@ -82,6 +83,7 @@ DbNode Neo4jClient::createNode(const char* graph_id, const char* nodetype, ...) 
 }
 
 DbEdge Neo4jClient::createEdge(const char* graph_id, const char* edge_type, ...) {
+    printf("Neo4jClient::createEdge\n");
     // Create a new dictionary to store the edge properties
     PyObject* properties = PyDict_New();
     if (properties == nullptr) {
@@ -136,6 +138,30 @@ void Neo4jClient::writeEdge(const DbNode& node1, const DbNode& node2, const DbEd
 void Neo4jClient::clearDatabase() {
     // Clear neo4j database
     PyObject_CallMethod(pInstance, "clear_database", nullptr);
+}
+
+Neo4jItemManager::Neo4jItemManager(Neo4jClient * bd) {
+    this->bd = bd;
+}
+
+DbItem*  Neo4jItemManager::itemCreateArray(){
+    DbItem *item= new DbItem();
+    if(item)
+    {
+        item->type=dbITEM_Array;
+    }
+    return item;
+}
+
+
+DbItem* Neo4jItemManager::itemCreateObject(){
+    DbItem *item= new DbItem();
+    if(item)
+    {
+        item->type=dbITEM_Object;
+    }
+    return item;
+
 }
 
 

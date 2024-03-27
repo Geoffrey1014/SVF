@@ -51,6 +51,7 @@ class ICFG : public GenericICFGTy
     friend class SVFIRReader;
     friend class ICFGSimplification;
     friend class SVFIRDbWRiter;
+    // friend class Neo4jItemManager;
 
 public:
 

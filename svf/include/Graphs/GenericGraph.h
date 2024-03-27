@@ -144,6 +144,8 @@ class GenericNode
 {
     friend class SVFIRWriter;
     friend class SVFIRReader;
+    friend class SVFIRDbWriter;
+    friend class Neo4jManager;
 
 public:
     typedef NodeTy NodeType;
@@ -351,6 +353,7 @@ class GenericGraph
     friend class GenericGraphReader<NodeTy, EdgeTy>;
     friend class GenericGraphDbWriter<NodeTy, EdgeTy>;
     friend class SVFIRDbWriter;
+    friend class Neo4jManager;
 
 public:
     typedef NodeTy NodeType;
