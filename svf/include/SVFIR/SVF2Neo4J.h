@@ -451,6 +451,9 @@ private:
     DbItem* genericNodeToDb(const GenericNode<NodeTy, EdgeTy>* node)
     {
         DbItem* root = neo4jItemManager->itemCreateObject();
+        DbNode dbNode = db->createNode("0", "hwg", "id", PyLong_FromLong(node->id), "nodeKind", PyLong_FromLong(node->nodeKind), nullptr);
+        db->writeNode(dbNode);
+        // delete &dbNode;
         ITEM_WRITE_FIELD(root, node, id);
         ITEM_WRITE_FIELD(root, node, nodeKind);
         ITEM_WRITE_FIELD(root, node, InEdges);

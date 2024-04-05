@@ -200,7 +200,9 @@ DbItem* SVFIRDbWriter::contentToItem(const RetICFGNode* node)
 }
 
 DbItem* SVFIRDbWriter::contentToItem(const ICFGNode* node)
-{
+{   
+    std::cout << "print node:" << std::endl;
+    std::cout << node->toString() << std::endl;
     DbItem* root = genericNodeToDb(node);
     ITEM_WRITE_FIELD(root, node, fun);
     ITEM_WRITE_FIELD(root, node, bb);

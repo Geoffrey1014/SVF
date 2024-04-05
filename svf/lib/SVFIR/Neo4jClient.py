@@ -27,7 +27,7 @@ class Neo4jClient:
     def create_node(self, nodetype, properties):
         '''
         Creating a node.
-        nodetyep specifies the type of node and properties specifies the attributes of the node.
+        nodetype specifies the type of node and properties specifies the attributes of the node.
         '''
         with self._driver.session() as session:
             session.execute_write(self._create_node, 

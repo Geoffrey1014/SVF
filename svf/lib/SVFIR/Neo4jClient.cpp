@@ -164,7 +164,15 @@ DbItem* Neo4jItemManager::itemCreateObject(){
 
 }
 
+// DbItem* Neo4jItemManager::itemCreateDbNode(){
+//     DbItem *item= new DbNode();
+//     if(item)
+//     {
+//         item->type=dbITEM_Object;
+//     }
+//     return item;
 
+// }
 
 // int main() {
 //     // Initialize the neo4j client

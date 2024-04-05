@@ -163,7 +163,7 @@ private:
 
 public:
     // Constructor
-    DbNode(const char* nodetype, PyObject* properties) {
+    DbNode(const char* nodetype, PyObject* properties): DbItem(){
         // Set the nodetype
         this->nodetype = nodetype;
         // Set the properties
@@ -194,7 +194,7 @@ private:
 
 public:
     // Constructor
-    DbEdge(const char* edge_type, PyObject* edge_properties) {
+    DbEdge(const char* edge_type, PyObject* edge_properties): DbItem(){
         // Set the edge_type
         this->edge_type = edge_type;
         // Set the edge_properties
@@ -245,8 +245,9 @@ private:
 public:
     Neo4jItemManager(Neo4jClient * bd);
     ~Neo4jItemManager();
+    DbItem * itemCreateDbNode();
 
-    DbItem* dbItem_New_Item();
+    DbItem * dbItem_New_Item();
     /* Delete a DbItem entity and all subentities. */
     void dbItem_Delete(DbItem *item);
 
