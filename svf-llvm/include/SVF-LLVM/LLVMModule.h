@@ -96,13 +96,14 @@ private:
     LLVMType2SVFTypeMap LLVMType2SVFType;
     Type2TypeInfoMap Type2TypeInfo;
     ObjTypeInference* typeInference;
-    NodeID callGraphNodeNum;
 
     CSToCallNodeMapTy CSToCallNodeMap; ///< map a callsite to its CallICFGNode
     CSToRetNodeMapTy CSToRetNodeMap; ///< map a callsite to its RetICFGNode
     InstToBlockNodeMapTy InstToBlockNodeMap; ///< map a basic block to its ICFGNode
     FunToFunEntryNodeMapTy FunToFunEntryNodeMap; ///< map a function to its FunExitICFGNode
     FunToFunExitNodeMapTy FunToFunExitNodeMap; ///< map a function to its FunEntryICFGNode
+
+    CallGraph* callgraph;
 
     /// Constructor
     LLVMModuleSet();

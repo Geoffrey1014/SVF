@@ -60,10 +60,9 @@ void SaberCondAllocator::allocate(const SVFModule *M)
 {
     DBOUT(DGENERAL, outs() << pasMsg("path condition allocation starts\n"));
 
-    for (SVFModule::const_callgraphnode_iterator iter = M->callgraphnode_begin(), eiter = M->callgraphnode_end();
-            iter != eiter; ++iter)
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction *func = (*iter)->getFunction();
+        const SVFFunction *func = (item.second)->getFunction();
         if (!SVFUtil::isExtCall(func))
         {
             // Allocate conditions for a program.

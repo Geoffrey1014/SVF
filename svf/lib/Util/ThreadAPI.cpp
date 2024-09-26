@@ -273,9 +273,9 @@ void ThreadAPI::performAPIStat(SVFModule* module)
 
     statInit(tdAPIStatMap);
 
-    for (SVFModule::const_callgraphnode_iterator it = module->callgraphnode_begin(), eit = module->callgraphnode_end(); it != eit; ++it)
+    for(const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        for (SVFFunction::const_iterator bit = (*it)->getFunction()->begin(), ebit = (*it)->getFunction()->end(); bit != ebit; ++bit)
+        for (SVFFunction::const_iterator bit = (item.second)->getFunction()->begin(), ebit = (item.second)->getFunction()->end(); bit != ebit; ++bit)
         {
             const SVFBasicBlock* bb = *bit;
             for (const auto& svfInst: bb->getICFGNodeList())

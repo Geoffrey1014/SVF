@@ -215,13 +215,11 @@ void SVFStat::performStat()
 
 void SVFStat::branchStat()
 {
-    SVFModule* module = SVFIR::getPAG()->getModule();
     u32_t numOfBB_2Succ = 0;
     u32_t numOfBB_3Succ = 0;
-    for (SVFModule::const_callgraphnode_iterator funIter = module->callgraphnode_begin(), funEiter = module->callgraphnode_end();
-            funIter != funEiter; ++funIter)
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction* func = (*funIter)->getFunction();
+        const SVFFunction* func = (item.second)->getFunction();
         for (SVFFunction::const_iterator bbIt = func->begin(), bbEit = func->end();
                 bbIt != bbEit; ++bbIt)
         {

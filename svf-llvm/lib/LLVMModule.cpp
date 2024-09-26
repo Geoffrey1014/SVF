@@ -79,7 +79,7 @@ LLVMModuleSet::LLVMModuleSet()
     : symInfo(SymbolTableInfo::SymbolInfo()),
       svfModule(SVFModule::getSVFModule()), typeInference(new ObjTypeInference())
 {
-    callGraphNodeNum = 0;
+
 }
 
 LLVMModuleSet::~LLVMModuleSet()
@@ -195,6 +195,8 @@ void LLVMModuleSet::createSVFDataStructure()
         }
     }
 
+    callgraph = new CallGraph();
+
     for (const Function* func: candidateDefs)
     {
         createCallGraphNode(func);
@@ -252,10 +254,11 @@ void LLVMModuleSet::createCallGraphNode(const Function* func)
         func->isDeclaration(), LLVMUtil::isIntrinsicFun(func),
         func->hasAddressTaken(), func->isVarArg(), new SVFLoopAndDomInfo);
 
-    NodeID id = callGraphNodeNum;
-    CallGraphNode* callGraphNode = new CallGraphNode(id, svfFunc);
-    svfModule->addCallGraphNode(callGraphNode);
-    callGraphNodeNum++;
+    // create call graph node
+    callgraph->addCallGraphNode(
+        new CallGraphNode(callgraph->getCallGraphNodeNum(), svfFunc));
+    callgraph->incCallGraphNodeNum();
+
     addFunctionMap(func, svfFunc);
 
     for (const Argument& arg : func->args())

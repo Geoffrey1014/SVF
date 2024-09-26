@@ -96,8 +96,9 @@ void AbstractInterpretation::initWTO()
     }
 
     // Initialize WTO for each function in the module
-    for (const CallGraphNode* cgn : svfir->getModule()->getCallGraphNodeSet())
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
+        const CallGraphNode* cgn = item.second;
         const SVFFunction* fun = cgn->getFunction();
         if(fun->isDeclaration())
             continue;

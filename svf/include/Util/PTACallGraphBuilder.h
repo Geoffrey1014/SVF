@@ -51,7 +51,7 @@ public:
     }
 
     /// Build PTA ptaCallGraph
-    PTACallGraph* buildPTACallGraph(SVFModule* svfModule);
+    PTACallGraph* buildPTACallGraph();
 
 };
 

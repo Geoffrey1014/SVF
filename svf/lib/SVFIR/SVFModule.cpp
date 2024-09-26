@@ -47,8 +47,9 @@ SVFModule::~SVFModule()
 
 const CallGraphNode* SVFModule::getCallGraphNode(const std::string& name)
 {
-    for (const CallGraphNode* cgn : getCallGraphNodeSet())
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
+        const CallGraphNode* cgn = item.second;
         if (cgn->getName() == name)
         {
             return cgn;

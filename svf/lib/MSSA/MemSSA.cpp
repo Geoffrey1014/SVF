@@ -576,10 +576,9 @@ u32_t MemSSA::getBBPhiNum() const
 void MemSSA::dumpMSSA(OutStream& Out)
 {
 
-    for (SVFModule::const_callgraphnode_iterator fit = pta->getModule()->callgraphnode_begin(), efit = pta->getModule()->callgraphnode_end();
-            fit != efit; ++fit)
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction* fun = (*fit)->getFunction();
+        const SVFFunction* fun = (item.second)->getFunction();
         if(Options::MSSAFun()!="" && Options::MSSAFun()!=fun->getName())
             continue;
 

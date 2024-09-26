@@ -248,7 +248,7 @@ private:
     static CallSiteToIdMap csToIdMap;	///< Map a pair of call instruction and callee to a callsite ID
     static IdToCallSiteMap idToCSMap;	///< Map a callsite ID to a pair of call instruction and callee
     static CallSiteID totalCallSiteNum;	///< CallSiteIDs, start from 1;
-
+    NodeID callGraphNodeNum;
 protected:
     FunToCallGraphNodeMap funToCallGraphNodeMap; ///< Call Graph node map
     CallInstToCallGraphEdgesMap callinstToCallGraphEdgesMap; ///< Map a call instruction to its corresponding call edges
@@ -441,6 +441,14 @@ public:
 
     /// View the graph from the debugger
     void view();
+
+    NodeID getCallGraphNodeNum() const {
+        return callGraphNodeNum;
+    }
+
+    void incCallGraphNodeNum() {
+        callGraphNodeNum++;
+    }
 };
 
 } // End namespace SVF

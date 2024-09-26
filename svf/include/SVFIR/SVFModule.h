@@ -49,7 +49,6 @@ public:
     typedef std::vector<SVFGlobalValue*> AliasSetType;
     typedef std::vector<SVFConstant*> ConstantType;
     typedef std::vector<SVFOtherValue*> OtherValueType;
-    typedef std::vector<const CallGraphNode*> CallGraphNodeSetType;
 
     /// Iterators type def
     typedef FunctionSetType::iterator iterator;
@@ -62,8 +61,6 @@ public:
     typedef ConstantType::const_iterator const_cdata_iterator;
     typedef OtherValueType::iterator ovalue_iterator;
     typedef OtherValueType::const_iterator const_ovalue_iterator;
-    typedef CallGraphNodeSetType::iterator callgraphnode_iterator;
-    typedef CallGraphNodeSetType::const_iterator const_callgraphnode_iterator;
 
 private:
     static SVFModule* svfModule;
@@ -73,7 +70,6 @@ private:
     AliasSetType AliasSet;        ///< The Aliases in the module
     ConstantType ConstantSet;     ///< The ConstantData in the module
     OtherValueType OtherValueSet; ///< All other values in the module
-    CallGraphNodeSetType CallGraphNodeSet;
 
     /// Constructors
     SVFModule() = default;
@@ -89,9 +85,9 @@ public:
         pagReadFromTxt = txt;
     }
 
-    inline void setModuleIdentifier(const std::string& moduleIdentifier)
+    inline void setModuleIdentifier(const std::string& moduleIdf)
     {
-        this->moduleIdentifier = moduleIdentifier;
+        this->moduleIdentifier = moduleIdf;
     }
 
     static inline std::string pagFileName()
@@ -108,10 +104,6 @@ public:
 
 
     ///@{
-    inline void addCallGraphNode(CallGraphNode* cgn)
-    {
-        CallGraphNodeSet.push_back(cgn);
-    }
     inline void addGlobalSet(SVFGlobalValue* glob)
     {
         GlobalSet.push_back(glob);
@@ -135,24 +127,6 @@ public:
 
     /// Iterators
     ///@{
-
-    callgraphnode_iterator callgraphnode_begin()
-    {
-        return CallGraphNodeSet.begin();
-    }
-    const_callgraphnode_iterator callgraphnode_begin() const
-    {
-        return CallGraphNodeSet.begin();
-    }
-    callgraphnode_iterator callgraphnode_end()
-    {
-        return CallGraphNodeSet.end();
-    }
-    const_callgraphnode_iterator callgraphnode_end() const
-    {
-        return CallGraphNodeSet.end();
-    }
-
     global_iterator global_begin()
     {
         return GlobalSet.begin();
@@ -219,10 +193,6 @@ public:
         }
     }
 
-    inline const CallGraphNodeSetType& getCallGraphNodeSet() const
-    {
-        return CallGraphNodeSet;
-    }
     inline const ConstantType& getConstantSet() const
     {
         return ConstantSet;

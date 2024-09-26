@@ -97,6 +97,7 @@ bool CallGraphNode::isReachableFromProgEntry() const
 /// Constructor
 CallGraph::CallGraph(CGEK k): kind(k)
 {
+    callGraphNodeNum = 0;
     numOfResolvedIndCallEdge = 0;
 }
 

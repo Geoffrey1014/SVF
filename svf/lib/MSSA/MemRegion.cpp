@@ -174,11 +174,9 @@ SVFIR::SVFStmtList& MRGenerator::getPAGEdgesFromInst(const ICFGNode* node)
 void MRGenerator::collectModRefForLoadStore()
 {
 
-    SVFModule* svfModule = pta->getModule();
-    for (SVFModule::const_callgraphnode_iterator fi = svfModule->callgraphnode_begin(), efi = svfModule->callgraphnode_end(); fi != efi;
-            ++fi)
+    for(const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction& fun = *((*fi)->getFunction());
+        const SVFFunction& fun = *((item.second)->getFunction());
 
         /// if this function does not have any caller, then we do not care its MSSA
         if (Options::IgnoreDeadFun() && fun.isUncalledFunction())

@@ -185,9 +185,9 @@ void TCT::markRelProcs(const SVFFunction* svffun)
  */
 void TCT::collectEntryFunInCallGraph()
 {
-    for(SVFModule::const_callgraphnode_iterator it = getSVFModule()->callgraphnode_begin(), eit = getSVFModule()->callgraphnode_end(); it!=eit; ++it)
+    for(const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction* fun = (*it)->getFunction();
+        const SVFFunction* fun = (item.second)->getFunction();
         if (SVFUtil::isExtCall(fun))
             continue;
         PTACallGraphNode* node = tcg->getCallGraphNode(fun);

@@ -123,10 +123,9 @@ s64_t CDGBuilder::getBBSuccessorBranchID(const SVFBasicBlock *BB, const SVFBasic
  */
 void CDGBuilder::buildControlDependence(const SVFModule *svfgModule)
 {
-    for (SVFModule::const_callgraphnode_iterator iter = svfgModule->callgraphnode_begin(), eiter = svfgModule->callgraphnode_end();
-            iter != eiter; ++iter)
+    for (const auto& item: *PAG::getPAG()->getCallGraph())
     {
-        const SVFFunction *svfFun = (*iter)->getFunction();
+        const SVFFunction *svfFun = (item.second)->getFunction();
         if (SVFUtil::isExtCall(svfFun)) continue;
         // extract basic block edges to be processed
         Map<const SVFBasicBlock *, std::vector<const SVFBasicBlock *>> BBS;
