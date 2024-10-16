@@ -83,24 +83,19 @@ void AbstractInterpretation::initWTO()
     // Detect if the call graph has cycles by finding its strongly connected components (SCC)
     Andersen::CallGraphSCC* callGraphScc = ander->getCallGraphSCC();
     callGraphScc->find();
-    auto callGraph = ander->getCallGraph();
+    CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
 
     // Iterate through the call graph
-    for (auto it = callGraph->begin(); it != callGraph->end(); it++)
+    for (auto it = svfirCallGraph->begin(); it != svfirCallGraph->end(); it++)
     {
         // Check if the current function is part of a cycle
         if (callGraphScc->isInCycle(it->second->getId()))
-            recursiveFuns.insert(it->second->getFunction()); // Mark the function as recursive
-    }
-
-    // Initialize WTO for each function in the module
-    for (const SVFFunction* fun : svfir->getModule()->getFunctionSet())
-    {
-        if(fun->isDeclaration())
+            recursiveFuns.insert(it->second); // Mark the function as recursive
+        if (it->second->isDeclaration())
             continue;
-        auto* wto = new ICFGWTO(icfg, icfg->getFunEntryICFGNode(fun));
+        auto* wto = new ICFGWTO(icfg, icfg->getFunEntryICFGNode(it->second->getFunction()));
         wto->init();
-        funcToWTO[fun] = wto;
+        funcToWTO[it->second] = wto;
     }
 }
 /// Program entry
@@ -111,9 +106,9 @@ void AbstractInterpretation::analyse()
     handleGlobalNode();
     getAbsStateFromTrace(
         icfg->getGlobalICFGNode())[PAG::getPAG()->getBlkPtr()] = IntervalValue::top();
-    if (const SVFFunction* fun = svfir->getModule()->getSVFFunction("main"))
+    if (const CallGraphNode* cgn = svfir->getCallGraph()->getCallGraphNode("main"))
     {
-        ICFGWTO* wto = funcToWTO[fun];
+        ICFGWTO* wto = funcToWTO[cgn];
         handleWTOComponents(wto->getWTOComponents());
     }
 }
@@ -585,7 +580,12 @@ void AbstractInterpretation::extCallPass(const SVF::CallICFGNode *callNode)
 
 bool AbstractInterpretation::isRecursiveCall(const SVF::CallICFGNode *callNode)
 {
-    return recursiveFuns.find(callNode->getCalledFunction()) != recursiveFuns.end();
+    const SVFFunction *callfun = callNode->getCalledFunction();
+    CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
+    if (!callfun)
+        return false;
+    else
+        return recursiveFuns.find(svfirCallGraph->getCallGraphNode(callfun)) != recursiveFuns.end();
 }
 
 void AbstractInterpretation::recursiveCallPass(const SVF::CallICFGNode *callNode)
@@ -609,7 +609,12 @@ void AbstractInterpretation::recursiveCallPass(const SVF::CallICFGNode *callNode
 
 bool AbstractInterpretation::isDirectCall(const SVF::CallICFGNode *callNode)
 {
-    return funcToWTO.find(callNode->getCalledFunction()) != funcToWTO.end();
+    const SVFFunction *callfun =callNode->getCalledFunction();
+    CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
+    if (!callfun)
+        return false;
+    else
+        return funcToWTO.find(svfirCallGraph->getCallGraphNode(callfun)) != funcToWTO.end();
 }
 void AbstractInterpretation::directCallFunPass(const SVF::CallICFGNode *callNode)
 {
@@ -618,7 +623,9 @@ void AbstractInterpretation::directCallFunPass(const SVF::CallICFGNode *callNode
 
     abstractTrace[callNode] = as;
 
-    ICFGWTO* wto = funcToWTO[callNode->getCalledFunction()];
+    const SVFFunction *callfun =callNode->getCalledFunction();
+    CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
+    ICFGWTO* wto = funcToWTO[svfirCallGraph->getCallGraphNode(callfun)];
     handleWTOComponents(wto->getWTOComponents());
 
     callSiteStack.pop_back();
@@ -646,7 +653,7 @@ void AbstractInterpretation::indirectCallFunPass(const SVF::CallICFGNode *callNo
     AbstractValue Addrs = as[call_id];
     NodeID addr = *Addrs.getAddrs().begin();
     SVFVar *func_var = svfir->getGNode(AbstractState::getInternalID(addr));
-    const SVFFunction *callfun = func_var->getCallGraphNode()->getFunction();
+    const CallGraphNode *callfun = func_var->getCallGraphNode();
     if (callfun)
     {
         callSiteStack.push_back(callNode);
