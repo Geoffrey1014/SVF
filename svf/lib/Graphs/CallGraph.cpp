@@ -70,6 +70,14 @@ const std::string CallGraphEdge::toString() const
     return rawstr.str();
 }
 
+CallGraphNode::CallGraphNode(NodeID i, const SVFFunction* f, bool declare, bool intrinsic, bool adt, bool varg):
+      GenericCallGraphNodeTy(i,CallNodeKd), fun(f), isDecl(declare), intrinsic(intrinsic),
+      addrTaken(adt), isUncalled(false), isNotRet(false), varArg(varg)
+{
+}
+
+
+
 const std::string CallGraphNode::toString() const
 {
     std::string str;
@@ -157,7 +165,7 @@ void CallGraph::destroy()
 void CallGraph::addCallGraphNode(const SVFFunction* fun)
 {
     NodeID id  = callGraphNodeNum;
-    CallGraphNode *callGraphNode = new CallGraphNode(id, fun);
+    CallGraphNode *callGraphNode = new CallGraphNode(id, fun, fun->isDeclaration(), fun->isIntrinsic(), fun->hasAddressTaken(), fun->isVarArg());
     addGNode(id, callGraphNode);
     funToCallGraphNodeMap[callGraphNode->getFunction()] = callGraphNode;
     callGraphNodeNum++;
