@@ -356,7 +356,10 @@ bool SVFUtil::isExtCall(const CallICFGNode* cs)
 
 bool SVFUtil::isHeapAllocExtCallViaArg(const CallICFGNode* cs)
 {
-    return isHeapAllocExtFunViaArg(cs->getCalledFunction()->getFunction());
+    if (cs->getCalledFunction())
+        return isHeapAllocExtFunViaArg(cs->getCalledFunction()->getFunction());
+    else
+        return false;
 }
 
 
