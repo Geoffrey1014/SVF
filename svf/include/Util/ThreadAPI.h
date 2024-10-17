@@ -39,6 +39,7 @@ class SVFModule;
 class ICFGNode;
 class CallICFGNode;
 class SVFVar;
+class CallGraphNode;
 
 /*
  * ThreadAPI class contains interfaces for pthread programs
@@ -89,16 +90,7 @@ private:
     static ThreadAPI* tdAPI;
 
     /// Get the function type if it is a threadAPI function
-    inline TD_TYPE getType(const SVFFunction* F) const
-    {
-        if(F)
-        {
-            TDAPIMap::const_iterator it= tdAPIMap.find(F->getName());
-            if(it != tdAPIMap.end())
-                return it->second;
-        }
-        return TD_DUMMY;
-    }
+    TD_TYPE getType(const CallGraphNode* F) const;
 
 public:
     /// Return a static reference

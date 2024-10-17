@@ -39,7 +39,7 @@
 
 namespace SVF
 {
-
+class CallGraphNode;
 /*
  * Util class to assist pointer analysis
  */
@@ -306,7 +306,7 @@ inline bool isHeapAllocExtFunViaArg(const SVFFunction* fun)
 
 /// Get the position of argument that holds an allocated heap object.
 //@{
-inline u32_t getHeapAllocHoldingArgPosition(const SVFFunction* fun)
+inline u32_t getHeapAllocHoldingArgPosition(const SVFFunction* fun)  // TODO: hwg
 {
     return ExtAPI::getExtAPI()->get_alloc_arg_pos(fun);
 }
@@ -327,20 +327,12 @@ inline bool isProgEntryFunction(const SVFFunction* fun)
     return fun && fun->getName() == "main";
 }
 
-/// Get program entry function from function name.
-const SVFFunction* getProgFunction(const std::string& funName);
-
 /// Get program entry function.
 const SVFFunction* getProgEntryFunction();
 
 /// Return true if this is a program exit function call
 //@{
-inline bool isProgExitFunction (const SVFFunction * fun)
-{
-    return fun && (fun->getName() == "exit" ||
-                   fun->getName() == "__assert_rtn" ||
-                   fun->getName() == "__assert_fail" );
-}
+bool isProgExitFunction (const CallGraphNode * fun);
 
 /// Return true if this argument belongs to an uncalled function
 inline bool isArgOfUncalledFunction(const SVFValue* svfval)

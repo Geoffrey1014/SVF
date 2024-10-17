@@ -36,14 +36,8 @@
 using namespace SVF;
 using namespace SVFUtil;
 
-CallGraph* CallGraphBuilder::buildSVFIRCallGraph(SVFModule* svfModule)
+CallGraph* CallGraphBuilder::buildSVFIRCallGraph(CallGraph* callgraph)
 {
-    CallGraph* callgraph = new CallGraph();
-    for (const SVFFunction* svfFunc: svfModule->getFunctionSet())
-    {
-        callgraph->addCallGraphNode(svfFunc);
-    }
-
     for (const auto& item : *callgraph)
     {
         for (const SVFBasicBlock* svfbb : (item.second)->getFunction()->getBasicBlockList())
@@ -53,9 +47,9 @@ CallGraph* CallGraphBuilder::buildSVFIRCallGraph(SVFModule* svfModule)
                 if (SVFUtil::isNonInstricCallSite(inst))
                 {
                     const CallICFGNode* callBlockNode = cast<CallICFGNode>(inst);
-                    if(const SVFFunction* callee = callBlockNode->getCalledFunction())
+                    if(const CallGraphNode* callee = callBlockNode->getCalledFunction())
                     {
-                        callgraph->addDirectCallGraphEdge(callBlockNode,(item.second)->getFunction(),callee);
+                        callgraph->addDirectCallGraphEdge(callBlockNode,(item.second)->getFunction(),callee->getFunction()); // TODO: hwg
                     }
                 }
             }

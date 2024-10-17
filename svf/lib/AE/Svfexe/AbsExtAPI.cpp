@@ -386,7 +386,7 @@ std::string AbsExtAPI::strRead(AbstractState& as, const SVFVar* rhs)
 void AbsExtAPI::handleExtAPI(const CallICFGNode *call)
 {
     AbstractState& as = getAbsStateFromTrace(call);
-    const SVFFunction *fun = call->getCalledFunction();
+    const SVFFunction *fun = call->getCalledFunction()->getFunction();
     assert(fun && "SVFFunction* is nullptr");
     ExtAPIType extType = UNCLASSIFIED;
     // get type of mem api
@@ -546,7 +546,7 @@ void AbsExtAPI::handleStrcat(const SVF::CallICFGNode *call)
     // __strcat_chk, strcat, __wcscat_chk, wcscat, __strncat_chk, strncat, __wcsncat_chk, wcsncat
     // to check it is  strcat group or strncat group
     AbstractState& as = getAbsStateFromTrace(call);
-    const SVFFunction *fun = call->getCalledFunction();
+    const SVFFunction *fun = call->getCalledFunction()->getFunction();
     const std::vector<std::string> strcatGroup = {"__strcat_chk", "strcat", "__wcscat_chk", "wcscat"};
     const std::vector<std::string> strncatGroup = {"__strncat_chk", "strncat", "__wcsncat_chk", "wcsncat"};
     if (std::find(strcatGroup.begin(), strcatGroup.end(), fun->getName()) != strcatGroup.end())

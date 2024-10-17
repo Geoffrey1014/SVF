@@ -33,6 +33,18 @@ using namespace SVF;
 using namespace SVFUtil;
 
 
+bool FileChecker::isSourceLikeFun(const SVFFunction* fun)
+{
+    CallGraphNode* cgn = PAG::getPAG()->getCallGraph()->getCallGraphNode(fun);
+    return SaberCheckerAPI::getCheckerAPI()->isFOpen(cgn);
+}
+
+bool FileChecker::isSinkLikeFun(const SVFFunction* fun)
+{
+    CallGraphNode* cgn = PAG::getPAG()->getCallGraph()->getCallGraphNode(fun);
+    return SaberCheckerAPI::getCheckerAPI()->isFClose(cgn);
+}
+
 void FileChecker::reportBug(ProgSlice* slice)
 {
 

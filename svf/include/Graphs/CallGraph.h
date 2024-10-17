@@ -442,7 +442,7 @@ public:
     CallGraphEdge* getGraphEdge(CallGraphNode* src, CallGraphNode* dst,CallGraphEdge::CEDGEK kind, CallSiteID csId);
 
     /// Get all callees for a callsite
-    inline void getCallees(const CallICFGNode* cs, FunctionSet& callees)
+    inline void getCallees(const CallICFGNode* cs, FunctionSet& callees) //TODO: hwg
     {
         if(hasCallGraphEdge(cs))
         {

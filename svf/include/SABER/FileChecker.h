@@ -62,15 +62,10 @@ public:
         return false;
     }
 
-    inline bool isSourceLikeFun(const SVFFunction* fun)
-    {
-        return SaberCheckerAPI::getCheckerAPI()->isFOpen(fun);
-    }
+    bool isSourceLikeFun(const SVFFunction* fun);
+
     /// Whether the function is a heap deallocator (free/release memory)
-    inline bool isSinkLikeFun(const SVFFunction* fun)
-    {
-        return SaberCheckerAPI::getCheckerAPI()->isFClose(fun);
-    }
+    bool isSinkLikeFun(const SVFFunction* fun);
     /// Report file/close bugs
     void reportBug(ProgSlice* slice);
 };

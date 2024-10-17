@@ -179,7 +179,7 @@ void LeakChecker::testsValidation(const ProgSlice* slice)
 {
     const SVFGNode* source = slice->getSource();
     const CallICFGNode* cs = getSrcCSID(source);
-    const SVFFunction* fun = cs->getCalledFunction();
+    const CallGraphNode* fun = cs->getCalledFunction();
     if(fun==nullptr)
         return;
 
@@ -188,7 +188,7 @@ void LeakChecker::testsValidation(const ProgSlice* slice)
 }
 
 
-void LeakChecker::validateSuccessTests(const SVFGNode* source, const SVFFunction* fun)
+void LeakChecker::validateSuccessTests(const SVFGNode* source, const CallGraphNode* fun)
 {
 
     const CallICFGNode* cs = getSrcCSID(source);
@@ -243,7 +243,7 @@ void LeakChecker::validateSuccessTests(const SVFGNode* source, const SVFFunction
     }
 }
 
-void LeakChecker::validateExpectedFailureTests(const SVFGNode* source, const SVFFunction* fun)
+void LeakChecker::validateExpectedFailureTests(const SVFGNode* source, const CallGraphNode* fun)
 {
 
     const CallICFGNode* cs = getSrcCSID(source);

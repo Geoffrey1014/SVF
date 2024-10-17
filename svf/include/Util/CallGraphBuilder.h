@@ -46,7 +46,7 @@ public:
     CallGraphBuilder()=default;
 
     /// Buidl SVFIR callgraoh
-    CallGraph* buildSVFIRCallGraph(SVFModule* svfModule);
+    CallGraph* buildSVFIRCallGraph(CallGraph* callgraph);
 
     /// Build thread-aware callgraph
     ThreadCallGraph* buildThreadCallGraph();

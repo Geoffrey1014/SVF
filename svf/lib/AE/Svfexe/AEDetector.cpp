@@ -95,7 +95,7 @@ void BufOverflowDetector::detect(AbstractState& as, const ICFGNode* node)
     {
         // Handle call nodes by checking for external API calls
         const CallICFGNode* callNode = SVFUtil::cast<CallICFGNode>(node);
-        if (SVFUtil::isExtCall(callNode->getCalledFunction()))
+        if (SVFUtil::isExtCall(callNode->getCalledFunction()->getFunction()))
         {
             detectExtAPI(as, callNode);
         }
@@ -219,12 +219,12 @@ void BufOverflowDetector::initExtAPIBufOverflowCheckRules()
 void BufOverflowDetector::detectExtAPI(AbstractState& as,
                                        const CallICFGNode* call)
 {
-    assert(call->getCalledFunction() && "SVFFunction* is nullptr");
+    assert(call->getCalledFunction()->getFunction() && "SVFFunction* is nullptr");
 
     AbsExtAPI::ExtAPIType extType = AbsExtAPI::UNCLASSIFIED;
 
     // Determine the type of external memory API
-    for (const std::string &annotation : ExtAPI::getExtAPI()->getExtFuncAnnotations(call->getCalledFunction()))
+    for (const std::string &annotation : ExtAPI::getExtAPI()->getExtFuncAnnotations(call->getCalledFunction()->getFunction()))
     {
         if (annotation.find("MEMCPY") != std::string::npos)
             extType = AbsExtAPI::MEMCPY;

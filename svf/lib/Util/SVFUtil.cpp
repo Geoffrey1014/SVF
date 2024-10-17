@@ -334,7 +334,7 @@ bool SVFUtil::isIntrinsicInst(const ICFGNode* inst)
 {
     if (const CallICFGNode* call = SVFUtil::dyn_cast<CallICFGNode>(inst))
     {
-        const SVFFunction* func = call->getCalledFunction();
+        const CallGraphNode* func = call->getCalledFunction();
         if (func && func->isIntrinsic())
         {
             return true;
@@ -345,25 +345,31 @@ bool SVFUtil::isIntrinsicInst(const ICFGNode* inst)
 
 bool SVFUtil::isExtCall(const CallICFGNode* cs)
 {
-    return isExtCall(cs->getCalledFunction());
+    if (cs->getCalledFunction()){
+        return isExtCall(cs->getCalledFunction()->getFunction());
+    }
+    else{
+        return false;
+    }
+
 }
 
 bool SVFUtil::isHeapAllocExtCallViaArg(const CallICFGNode* cs)
 {
-    return isHeapAllocExtFunViaArg(cs->getCalledFunction());
+    return isHeapAllocExtFunViaArg(cs->getCalledFunction()->getFunction());
 }
 
 
 u32_t SVFUtil::getHeapAllocHoldingArgPosition(const CallICFGNode* cs)
 {
-    return getHeapAllocHoldingArgPosition(cs->getCalledFunction());
+    return getHeapAllocHoldingArgPosition(cs->getCalledFunction()->getFunction());
 }
 
 
 bool SVFUtil::isExtCall(const ICFGNode* node)
 {
     if(!isCallSite(node)) return false;
-    return isExtCall(cast<CallICFGNode>(node)->getCalledFunction());
+    return isExtCall(cast<CallICFGNode>(node)->getCalledFunction()->getFunction());
 }
 
 bool SVFUtil::isHeapAllocExtCall(const ICFGNode* cs)
@@ -375,13 +381,13 @@ bool SVFUtil::isHeapAllocExtCall(const ICFGNode* cs)
 bool SVFUtil::isHeapAllocExtCallViaRet(const CallICFGNode* cs)
 {
     bool isPtrTy = cs->getType()->isPointerTy();
-    return isPtrTy && isHeapAllocExtFunViaRet(cs->getCalledFunction());
+    return isPtrTy && isHeapAllocExtFunViaRet(cs->getCalledFunction()->getFunction());
 }
 
 bool SVFUtil::isReallocExtCall(const CallICFGNode* cs)
 {
     bool isPtrTy = cs->getType()->isPointerTy();
-    return isPtrTy && isReallocExtFun(cs->getCalledFunction());
+    return isPtrTy && isReallocExtFun(cs->getCalledFunction()->getFunction());
 }
 
 
@@ -398,17 +404,13 @@ bool SVFUtil::isProgExitCall(const CallICFGNode* cs)
     return isProgExitFunction(cs->getCalledFunction());
 }
 
-/// Get program entry function from module.
-const SVFFunction* SVFUtil::getProgFunction(const std::string& funName)
+/// Return true if this is a program exit function call
+//@{
+bool SVFUtil::isProgExitFunction (const CallGraphNode * fun)
 {
-    CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
-    for (const auto& item: *svfirCallGraph)
-    {
-        const CallGraphNode*fun = item.second;
-        if (fun->getName()==funName)
-            return fun->getFunction();
-    }
-    return nullptr;
+    return fun && (fun->getName() == "exit" ||
+                   fun->getName() == "__assert_rtn" ||
+                   fun->getName() == "__assert_fail" );
 }
 
 /// Get program entry function from module.

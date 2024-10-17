@@ -169,17 +169,21 @@ void LLVMModuleSet::build()
 
     createSVFDataStructure();
     initSVFFunction();
+
+    callgraph = new CallGraph();
+    for (const auto& func : svfModule->getFunctionSet())
+    {
+        callgraph->addCallGraphNode(func);
+        addFunctionMap(SVFUtil::cast<Function>(getLLVMValue(func)),
+                       callgraph->getCallGraphNode(func));
+    }
+
+
     ICFGBuilder icfgbuilder;
     icfg = icfgbuilder.build();
 
     CallGraphBuilder callGraphBuilder;
-    callgraph = callGraphBuilder.buildSVFIRCallGraph(svfModule);
-
-    for (const auto& func : svfModule->getFunctionSet())
-    {
-        addFunctionMap(SVFUtil::cast<Function>(getLLVMValue(func)),
-                       callgraph->getCallGraphNode(func));
-    }
+    callGraphBuilder.buildSVFIRCallGraph(callgraph);
 }
 
 void LLVMModuleSet::createSVFDataStructure()
