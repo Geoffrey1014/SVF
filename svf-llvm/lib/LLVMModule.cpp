@@ -176,6 +176,8 @@ void LLVMModuleSet::build()
         callgraph->addCallGraphNode(func);
         addFunctionMap(SVFUtil::cast<Function>(getLLVMValue(func)),
                        callgraph->getCallGraphNode(func));
+        SVFFunction* svffunc = const_cast<SVFFunction*>(func);
+        svffunc->setCallGraphNode(callgraph->getCallGraphNode(func));
     }
 
 
