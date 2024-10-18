@@ -371,7 +371,7 @@ void SVFG::connectIndirectSVFGEdges()
                 for(ActualINSVFGNodeSet::iterator ait = actualIns.begin(), aeit = actualIns.end(); ait!=aeit; ++ait)
                 {
                     const ActualINSVFGNode* actualIn = SVFUtil::cast<ActualINSVFGNode>(getSVFGNode(*ait));
-                    addInterIndirectVFCallEdge(actualIn,formalIn,getCallSiteID(cs, formalIn->getFun()));
+                    addInterIndirectVFCallEdge(actualIn,formalIn,getCallSiteID(cs, formalIn->getFun()->getCallGraphNode()));
                 }
             }
         }
@@ -389,7 +389,7 @@ void SVFG::connectIndirectSVFGEdges()
                 for(ActualOUTSVFGNodeSet::iterator ait = actualOuts.begin(), aeit = actualOuts.end(); ait!=aeit; ++ait)
                 {
                     const ActualOUTSVFGNode* actualOut = SVFUtil::cast<ActualOUTSVFGNode>(getSVFGNode(*ait));
-                    addInterIndirectVFRetEdge(formalOut,actualOut,getCallSiteID(cs, formalOut->getFun()));
+                    addInterIndirectVFRetEdge(formalOut,actualOut,getCallSiteID(cs, formalOut->getFun()->getCallGraphNode()));
                 }
             }
             NodeID def = getDef(formalOut->getMRVer());
@@ -583,7 +583,7 @@ void SVFG::dump(const std::string& file, bool simple)
  */
 void SVFG::getInterVFEdgesForIndirectCallSite(const CallICFGNode* callICFGNode, const SVFFunction* callee, SVFGEdgeSetTy& edges)
 {
-    CallSiteID csId = getCallSiteID(callICFGNode, callee);
+    CallSiteID csId = getCallSiteID(callICFGNode, callee->getCallGraphNode());
     const RetICFGNode* retICFGNode = callICFGNode->getRetICFGNode();
 
     // Find inter direct call edges between actual param and formal param.
@@ -659,7 +659,7 @@ void SVFG::connectCallerAndCallee(const CallICFGNode* cs, const SVFFunction* cal
 {
     VFG::connectCallerAndCallee(cs,callee,edges);
 
-    CallSiteID csId = getCallSiteID(cs, callee);
+    CallSiteID csId = getCallSiteID(cs, callee->getCallGraphNode());
 
     // connect actual in and formal in
     if (hasFuncEntryChi(callee) && hasCallSiteMu(cs))

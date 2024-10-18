@@ -221,7 +221,7 @@ void CallGraph::addDirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction*
     CallGraphNode* caller = getCallGraphNode(callerFun);
     CallGraphNode* callee = getCallGraphNode(calleeFun);
 
-    CallSiteID csId = addCallSite(cs, callee->getFunction());
+    CallSiteID csId = addCallSite(cs, callee);
 
     if(!hasGraphEdge(caller,callee, CallGraphEdge::CallRetEdge,csId))
     {
@@ -243,7 +243,7 @@ void CallGraph::addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunctio
 
     numOfResolvedIndCallEdge++;
 
-    CallSiteID csId = addCallSite(cs, callee->getFunction());
+    CallSiteID csId = addCallSite(cs, callee);
 
     if(!hasGraphEdge(caller,callee, CallGraphEdge::CallRetEdge,csId))
     {

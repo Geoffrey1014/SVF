@@ -175,7 +175,7 @@ public:
 
     /// Get callsite given a callsiteID
     //@{
-    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const SVFFunction* func) const
+    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const CallGraphNode* func) const
     {
         return callgraph->getCallSiteID(cs, func);
     }

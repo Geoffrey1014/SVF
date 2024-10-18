@@ -432,7 +432,7 @@ public:
     typedef CallGraphEdge::CallGraphEdgeSet CallGraphEdgeSet;
     typedef Map<const SVFFunction*, CallGraphNode *> FunToCallGraphNodeMap;
     typedef Map<const CallICFGNode*, CallGraphEdgeSet> CallInstToCallGraphEdgesMap;
-    typedef std::pair<const CallICFGNode*, const SVFFunction*> CallSitePair;
+    typedef std::pair<const CallICFGNode*, const CallGraphNode*> CallSitePair;
     typedef Map<CallSitePair, CallSiteID> CallSiteToIdMap;
     typedef Map<CallSiteID, CallSitePair> IdToCallSiteMap;
     typedef Set<const CallGraphNode*> FunctionNodeSet;
@@ -540,9 +540,9 @@ public:
 
     /// Add/Get CallSiteID
     //@{
-    inline CallSiteID addCallSite(const CallICFGNode* cs, const SVFFunction* callee)
+    inline CallSiteID addCallSite(const CallICFGNode* cs, const CallGraphNode* callee)
     {
-        std::pair<const CallICFGNode*, const SVFFunction*> newCS(std::make_pair(cs, callee));
+        std::pair<const CallICFGNode*, const CallGraphNode*> newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
         //assert(it == csToIdMap.end() && "cannot add a callsite twice");
         if(it == csToIdMap.end())
@@ -554,14 +554,14 @@ public:
         }
         return it->second;
     }
-    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const SVFFunction* callee) const
+    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const CallGraphNode* callee) const
     {
         CallSitePair newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
         assert(it != csToIdMap.end() && "callsite id not found! This maybe a partially resolved callgraph, please check the indCallEdge limit");
         return it->second;
     }
-    inline bool hasCallSiteID(const CallICFGNode* cs, const SVFFunction* callee) const
+    inline bool hasCallSiteID(const CallICFGNode* cs, const CallGraphNode* callee) const
     {
         CallSitePair newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
@@ -581,7 +581,7 @@ public:
     {
         return getCallSite(id)->getCaller();
     }
-    inline const SVFFunction* getCalleeOfCallSite(CallSiteID id) const
+    inline const CallGraphNode* getCalleeOfCallSite(CallSiteID id) const
     {
         return getCallSitePair(id).second;
     }

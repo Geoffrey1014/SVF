@@ -823,7 +823,7 @@ void VFG::connectDirectVFGEdges()
             {
                 const CallICFGNode* cs = (*it)->getCallSite();
                 ActualParmVFGNode* acutalParm = getActualParmVFGNode((*it)->getRHSVar(),cs);
-                addInterEdgeFromAPToFP(acutalParm,formalParm,getCallSiteID(cs, formalParm->getFun()));
+                addInterEdgeFromAPToFP(acutalParm,formalParm,getCallSiteID(cs, formalParm->getFun()->getCallGraphNode()));
             }
         }
         else if(FormalRetVFGNode* calleeRet = SVFUtil::dyn_cast<FormalRetVFGNode>(node))
@@ -836,7 +836,7 @@ void VFG::connectDirectVFGEdges()
             {
                 ActualRetVFGNode* callsiteRev = getActualRetVFGNode((*it)->getLHSVar());
                 const CallICFGNode* callBlockNode = (*it)->getCallSite();
-                addInterEdgeFromFRToAR(calleeRet,callsiteRev, getCallSiteID(callBlockNode, calleeRet->getFun()));
+                addInterEdgeFromFRToAR(calleeRet,callsiteRev, getCallSiteID(callBlockNode, calleeRet->getFun()->getCallGraphNode()));
             }
         }
         /// Do not process FormalRetVFGNode, as they are connected by copy within callee
@@ -854,7 +854,7 @@ void VFG::connectDirectVFGEdges()
             TDForkPE* forkedge = SVFUtil::cast<TDForkPE>(*iter);
             ActualParmVFGNode* acutalParm = getActualParmVFGNode(forkedge->getRHSVar(),forkedge->getCallSite());
             FormalParmVFGNode* formalParm = getFormalParmVFGNode(forkedge->getLHSVar());
-            addInterEdgeFromAPToFP(acutalParm,formalParm,getCallSiteID(forkedge->getCallSite(), formalParm->getFun()));
+            addInterEdgeFromAPToFP(acutalParm,formalParm,getCallSiteID(forkedge->getCallSite(), formalParm->getFun()->getCallGraphNode()));
         }
         /// add join edge
         SVFStmt::SVFStmtSetTy& joins = getPAGEdgeSet(SVFStmt::ThreadJoin);
@@ -864,7 +864,7 @@ void VFG::connectDirectVFGEdges()
             TDJoinPE* joinedge = SVFUtil::cast<TDJoinPE>(*iter);
             NodeID callsiteRev = getDef(joinedge->getLHSVar());
             FormalRetVFGNode* calleeRet = getFormalRetVFGNode(joinedge->getRHSVar());
-            addRetEdge(calleeRet->getId(),callsiteRev, getCallSiteID(joinedge->getCallSite(), calleeRet->getFun()));
+            addRetEdge(calleeRet->getId(),callsiteRev, getCallSiteID(joinedge->getCallSite(), calleeRet->getFun()->getCallGraphNode()));
         }
     }
 }
@@ -972,8 +972,7 @@ void VFG::updateCallGraph(PointerAnalysis* pta)
  */
 void VFG::connectCallerAndCallee(const CallICFGNode* callBlockNode, const SVFFunction* callee, VFGEdgeSetTy& edges)
 {
-    SVFIR * pag = SVFIR::getPAG();
-    CallSiteID csId = getCallSiteID(callBlockNode, callee);
+    CallSiteID csId = getCallSiteID(callBlockNode, callee->getCallGraphNode());
     const RetICFGNode* retBlockNode = callBlockNode->getRetICFGNode();
     // connect actual and formal param
     if (pag->hasCallSiteArgsMap(callBlockNode) && pag->hasFunArgsList(callee) &&

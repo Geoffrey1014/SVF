@@ -390,7 +390,7 @@ void SVFG::readFile(const string& filename)
         {
             const FormalINSVFGNode* formalIn = SVFUtil::cast<FormalINSVFGNode>(getSVFGNode(src));
             const ActualINSVFGNode* actualIn = SVFUtil::cast<ActualINSVFGNode>(getSVFGNode(dst));
-            addInterIndirectVFCallEdge(actualIn,formalIn, getCallSiteID(actualIn->getCallSite(), formalIn->getFun()));
+            addInterIndirectVFCallEdge(actualIn,formalIn, getCallSiteID(actualIn->getCallSite(), formalIn->getFun()->getCallGraphNode()));
         }
         else if(type == "FormalOUTSVFGNode")
         {
@@ -402,7 +402,7 @@ void SVFG::readFile(const string& filename)
             else
             {
                 const ActualOUTSVFGNode* actualOut = SVFUtil::cast<ActualOUTSVFGNode>(getSVFGNode(dst));
-                addInterIndirectVFRetEdge(formalOut,actualOut,getCallSiteID(actualOut->getCallSite(), formalOut->getFun()));
+                addInterIndirectVFRetEdge(formalOut,actualOut,getCallSiteID(actualOut->getCallSite(), formalOut->getFun()->getCallGraphNode()));
             }
         }
         else if(type == "ActualINSVFGNode")
