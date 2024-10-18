@@ -45,7 +45,7 @@ class SVFGBuilder
 public:
     typedef PointerAnalysis::CallSiteSet CallSiteSet;
     typedef PointerAnalysis::CallEdgeMap CallEdgeMap;
-    typedef PointerAnalysis::FunctionSet FunctionSet;
+    typedef PointerAnalysis::FunctionNodeSet FunctionSet;
     typedef SVFG::SVFGEdgeSetTy SVFGEdgeSet;
 
     /// Constructor

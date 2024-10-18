@@ -176,9 +176,9 @@ bool CFLAlias::updateCallGraph(const CallSiteToFunPtrMap& callsites)
     onTheFlyCallGraphSolve(callsites,newEdges);
     for(CallEdgeMap::iterator it = newEdges.begin(), eit = newEdges.end(); it!=eit; ++it )
     {
-        for(FunctionSet::iterator cit = it->second.begin(), ecit = it->second.end(); cit!=ecit; ++cit)
+        for(FunctionNodeSet::iterator cit = it->second.begin(), ecit = it->second.end(); cit!=ecit; ++cit)
         {
-            connectCaller2CalleeParams(it->first,(*cit)->getCallGraphNode());
+            connectCaller2CalleeParams(it->first,*cit);
         }
     }
 

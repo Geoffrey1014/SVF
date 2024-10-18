@@ -101,8 +101,8 @@ public:
     //@{
     typedef Set<const CallICFGNode*> CallSiteSet;
     typedef SVFIR::CallSiteToFunPtrMap CallSiteToFunPtrMap;
-    typedef Set<const SVFFunction*> FunctionSet;
-    typedef OrderedMap<const CallICFGNode*, FunctionSet> CallEdgeMap;
+    typedef Set<const CallGraphNode*> FunctionNodeSet;
+    typedef OrderedMap<const CallICFGNode*, FunctionNodeSet> CallEdgeMap;
     typedef SCCDetection<CallGraph*> CallGraphSCC;
     typedef Set<const SVFGlobalValue*> VTableSet;
     typedef Set<const SVFFunction*> VFunSet;
@@ -247,7 +247,7 @@ public:
     virtual const NodeSet& getRevPts(NodeID nodeId) = 0;
 
     /// Print targets of a function pointer
-    void printIndCSTargets(const CallICFGNode* cs, const FunctionSet& targets);
+    void printIndCSTargets(const CallICFGNode* cs, const FunctionNodeSet& targets);
 
     // Debug purpose
     //@{
@@ -373,7 +373,7 @@ public:
     {
         return getCallGraph()->hasIndCSCallees(cs);
     }
-    inline const FunctionSet& getIndCSCallees(const CallICFGNode* cs) const
+    inline const FunctionNodeSet& getIndCSCallees(const CallICFGNode* cs) const
     {
         return getCallGraph()->getIndCSCallees(cs);
     }

@@ -297,15 +297,14 @@ void SaberSVFGBuilder::AddExtActualParmSVFGNodes(CallGraph* callgraph)
     for(SVFIR::CSToArgsListMap::iterator it = pag->getCallSiteArgsMap().begin(),
             eit = pag->getCallSiteArgsMap().end(); it!=eit; ++it)
     {
-        CallGraph::FunctionSet callees;
+        CallGraph::FunctionNodeSet callees;
         callgraph->getCallees(it->first, callees);
-        for (CallGraph::FunctionSet::const_iterator cit = callees.begin(),
+        for (CallGraph::FunctionNodeSet::const_iterator cit = callees.begin(),
                 ecit = callees.end(); cit != ecit; cit++)
         {
 
-            const SVFFunction* fun = *cit;
-            if (SaberCheckerAPI::getCheckerAPI()->isMemDealloc(pag->getCallGraph()->getCallGraphNode(fun))
-                    || SaberCheckerAPI::getCheckerAPI()->isFClose(pag->getCallGraph()->getCallGraphNode(fun)))
+            if (SaberCheckerAPI::getCheckerAPI()->isMemDealloc(*cit)
+                    || SaberCheckerAPI::getCheckerAPI()->isFClose(*cit))
             {
                 SVFIR::SVFVarList& arglist = it->second;
                 for(SVFIR::SVFVarList::const_iterator ait = arglist.begin(), aeit = arglist.end(); ait!=aeit; ++ait)

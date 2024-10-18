@@ -696,7 +696,7 @@ bool FlowSensitive::updateCallGraph(const CallSiteToFunPtrMap& callsites)
     for (typename CallEdgeMap::value_type &csfs : newEdges)
     {
         const CallICFGNode *potentialCallSite = csfs.first;
-        FunctionSet &potentialFunctionSet = csfs.second;
+        FunctionNodeSet&potentialFunctionSet = csfs.second;
 
         // Check this callsite even calls anything per Andersen's.
         typename CallEdgeMap::const_iterator andersFunctionSetIt
@@ -706,11 +706,11 @@ bool FlowSensitive::updateCallGraph(const CallSiteToFunPtrMap& callsites)
             potentialFunctionSet.clear();
         }
 
-        const FunctionSet &andersFunctionSet = andersFunctionSetIt->second;
-        for (FunctionSet::iterator potentialFunctionIt = potentialFunctionSet.begin();
+        const FunctionNodeSet&andersFunctionSet = andersFunctionSetIt->second;
+        for (FunctionNodeSet::iterator potentialFunctionIt = potentialFunctionSet.begin();
                 potentialFunctionIt != potentialFunctionSet.end(); )
         {
-            const SVFFunction *potentialFunction = *potentialFunctionIt;
+            const CallGraphNode *potentialFunction = *potentialFunctionIt;
             if (andersFunctionSet.find(potentialFunction) == andersFunctionSet.end())
             {
                 // potentialFunction is not in the Andersen's call graph -- remove it.
@@ -744,11 +744,11 @@ void FlowSensitive::connectCallerAndCallee(const CallEdgeMap& newEdges, SVFGEdge
     for (; iter != eiter; iter++)
     {
         const CallICFGNode* cs = iter->first;
-        const FunctionSet & functions = iter->second;
-        for (FunctionSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
+        const FunctionNodeSet& functions = iter->second;
+        for (FunctionNodeSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
         {
-            const SVFFunction*  func = *func_iter;
-            svfg->connectCallerAndCallee(cs, func, edges);
+            const CallGraphNode*  func = *func_iter;
+            svfg->connectCallerAndCallee(cs, func->getFunction(), edges);
         }
     }
 }

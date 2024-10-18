@@ -51,12 +51,12 @@ void LeakChecker::initSrcs()
         if(cs->getFun()->isUncalledFunction() || !cs->getType()->isPointerTy())
             continue;
 
-        CallGraph::FunctionSet callees;
+        CallGraph::FunctionNodeSet callees;
         getCallgraph()->getCallees(cs->getCallICFGNode(),callees);
-        for(CallGraph::FunctionSet::const_iterator cit = callees.begin(), ecit = callees.end(); cit!=ecit; cit++)
+        for(CallGraph::FunctionNodeSet::const_iterator cit = callees.begin(), ecit = callees.end(); cit!=ecit; cit++)
         {
-            const SVFFunction* fun = *cit;
-            if (isSourceLikeFun(fun))
+            const CallGraphNode* fun = *cit;
+            if (isSourceLikeFun(fun->getFunction()))
             {
                 CSWorkList worklist;
                 SVFGNodeBS visited;
@@ -111,12 +111,12 @@ void LeakChecker::initSnks()
             eit = pag->getCallSiteArgsMap().end(); it!=eit; ++it)
     {
 
-        CallGraph::FunctionSet callees;
+        CallGraph::FunctionNodeSet callees;
         getCallgraph()->getCallees(it->first,callees);
-        for(CallGraph::FunctionSet::const_iterator cit = callees.begin(), ecit = callees.end(); cit!=ecit; cit++)
+        for(CallGraph::FunctionNodeSet::const_iterator cit = callees.begin(), ecit = callees.end(); cit!=ecit; cit++)
         {
-            const SVFFunction* fun = *cit;
-            if (isSinkLikeFun(fun))
+            const CallGraphNode* fun = *cit;
+            if (isSinkLikeFun(fun->getFunction()))
             {
                 SVFIR::SVFVarList &arglist = it->second;
                 assert(!arglist.empty()	&& "no actual parameter at deallocation site?");

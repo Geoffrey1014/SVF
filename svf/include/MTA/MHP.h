@@ -123,7 +123,7 @@ public:
 
 private:
 
-    inline const CallGraph::FunctionSet& getCallee(const CallICFGNode* inst, CallGraph::FunctionSet& callees)
+    inline const CallGraph::FunctionNodeSet& getCallee(const CallICFGNode* inst, CallGraph::FunctionNodeSet& callees)
     {
         tcg->getCallees(inst, callees);
         return callees;
@@ -482,7 +482,7 @@ private:
     {
         return getTCG()->getThreadAPI()->getJoinedThread(call);
     }
-    inline const CallGraph::FunctionSet& getCallee(const ICFGNode* inst, CallGraph::FunctionSet& callees)
+    inline const CallGraph::FunctionNodeSet& getCallee(const ICFGNode* inst, CallGraph::FunctionNodeSet& callees)
     {
         getTCG()->getCallees(SVFUtil::cast<CallICFGNode>(inst), callees);
         return callees;

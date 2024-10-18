@@ -281,9 +281,9 @@ bool AndersenSCD::updateCallGraph(const PointerAnalysis::CallSiteToFunPtrMap& ca
     NodePairSet cpySrcNodes;	/// nodes as a src of a generated new copy edge
     for(CallEdgeMap::iterator it = newEdges.begin(), eit = newEdges.end(); it!=eit; ++it )
     {
-        for(FunctionSet::iterator cit = it->second.begin(), ecit = it->second.end(); cit!=ecit; ++cit)
+        for(FunctionNodeSet::iterator cit = it->second.begin(), ecit = it->second.end(); cit!=ecit; ++cit)
         {
-            connectCaller2CalleeParams(it->first,*cit,cpySrcNodes);
+            connectCaller2CalleeParams(it->first,(*cit)->getFunction(),cpySrcNodes);
         }
     }
 

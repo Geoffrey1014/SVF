@@ -198,11 +198,11 @@ bool AndersenBase::updateCallGraph(const CallSiteToFunPtrMap& callsites)
     for (CallEdgeMap::iterator it = newEdges.begin(), eit = newEdges.end();
             it != eit; ++it)
     {
-        for (FunctionSet::iterator cit = it->second.begin(),
+        for (FunctionNodeSet::iterator cit = it->second.begin(),
                 ecit = it->second.end();
                 cit != ecit; ++cit)
         {
-            connectCaller2CalleeParams(it->first, *cit, cpySrcNodes);
+            connectCaller2CalleeParams(it->first, (*cit)->getFunction(), cpySrcNodes);
         }
     }
 
@@ -228,11 +228,11 @@ bool AndersenBase::updateThreadCallGraph(const CallSiteToFunPtrMap& callsites,
     onTheFlyThreadCallGraphSolve(callsites, newForkEdges);
     for (CallEdgeMap::iterator it = newForkEdges.begin(), eit = newForkEdges.end(); it != eit; it++)
     {
-        for (FunctionSet::iterator cit = it->second.begin(),
+        for (FunctionNodeSet::iterator cit = it->second.begin(),
                 ecit = it->second.end();
                 cit != ecit; ++cit)
         {
-            connectCaller2ForkedFunParams(it->first, *cit, cpySrcNodes);
+            connectCaller2ForkedFunParams(it->first,(*cit)->getFunction(), cpySrcNodes);
         }
     }
     return !newForkEdges.empty();

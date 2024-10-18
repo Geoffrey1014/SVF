@@ -56,7 +56,7 @@ class FlowDDA : public BVDataPTAImpl, public DDAVFSolver<NodeID,PointsTo,LocDPIt
 public:
     typedef BVDataPTAImpl::CallSiteSet CallSiteSet;
     typedef BVDataPTAImpl::CallEdgeMap	CallEdgeMap;
-    typedef BVDataPTAImpl::FunctionSet	FunctionSet;
+    typedef BVDataPTAImpl::FunctionNodeSet FunctionSet;
     /// Constructor
     FlowDDA(SVFIR* _pag, DDAClient* client): BVDataPTAImpl(_pag, PointerAnalysis::FlowS_DDA),
         DDAVFSolver<NodeID,PointsTo,LocDPItem>(),
@@ -142,8 +142,8 @@ public:
             const FunctionSet & functions = iter->second;
             for (FunctionSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
             {
-                const SVFFunction* func = *func_iter;
-                getSVFG()->connectCallerAndCallee(newcs, func, svfgEdges);
+                const CallGraphNode* func = *func_iter;
+                getSVFG()->connectCallerAndCallee(newcs, func->getFunction(), svfgEdges);
             }
         }
     }

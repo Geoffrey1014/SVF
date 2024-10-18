@@ -124,7 +124,7 @@ void FunptrDDAClient::performStat(PointerAnalysis* pta)
             continue;
         }
 
-        const CallGraph::FunctionSet& callees = callgraph->getIndCSCallees(cbn);
+        const CallGraph::FunctionNodeSet& callees = callgraph->getIndCSCallees(cbn);
         totalCallsites++;
         if(callees.size() == 0)
             zeroTargetCallsites++;

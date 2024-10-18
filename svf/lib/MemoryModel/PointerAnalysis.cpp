@@ -314,7 +314,7 @@ void PointerAnalysis::dumpPts(NodeID ptr, const PointsTo& pts)
 /*!
  * Print indirect call targets at an indirect callsite
  */
-void PointerAnalysis::printIndCSTargets(const CallICFGNode* cs, const FunctionSet& targets)
+void PointerAnalysis::printIndCSTargets(const CallICFGNode* cs, const FunctionNodeSet& targets)
 {
     outs() << "\nNodeID: " << getFunPtr(cs);
     outs() << "\nCallSite: ";
@@ -324,11 +324,11 @@ void PointerAnalysis::printIndCSTargets(const CallICFGNode* cs, const FunctionSe
 
     if (!targets.empty())
     {
-        FunctionSet::const_iterator fit = targets.begin();
-        FunctionSet::const_iterator feit = targets.end();
+        FunctionNodeSet::const_iterator fit = targets.begin();
+        FunctionNodeSet::const_iterator feit = targets.end();
         for (; fit != feit; ++fit)
         {
-            const SVFFunction* callee = *fit;
+            const CallGraphNode* callee = *fit;
             outs() << "\n\t" << callee->getName();
         }
     }
@@ -352,7 +352,7 @@ void PointerAnalysis::printIndCSTargets()
     for (; it != eit; ++it)
     {
         const CallICFGNode* cs = it->first;
-        const FunctionSet& targets = it->second;
+        const FunctionNodeSet& targets = it->second;
         printIndCSTargets(cs, targets);
     }
 
@@ -405,12 +405,12 @@ void PointerAnalysis::resolveIndCalls(const CallICFGNode* cs, const PointsTo& ta
                 if(SVFUtil::matchArgs(cs, callee) == false)
                     continue;
 
-                if(0 == getIndCallMap()[cs].count(callee))
+                if(0 == getIndCallMap()[cs].count(callee->getCallGraphNode()))
                 {
-                    newEdges[cs].insert(callee);
-                    getIndCallMap()[cs].insert(callee);
+                    newEdges[cs].insert(callee->getCallGraphNode());
+                    getIndCallMap()[cs].insert(callee->getCallGraphNode());
 
-                    callgraph->addIndirectCallGraphEdge(cs, cs->getCaller(), callee);
+                    callgraph->addIndirectCallGraphEdge(cs, cs->getCaller(), callee->getCallGraphNode());
                     // FIXME: do we need to update llvm call graph here?
                     // The indirect call is maintained by ourself, We may update llvm's when we need to
                     //CallGraphNode* callgraphNode = callgraph->getOrInsertFunction(cs.getCaller());
@@ -467,15 +467,15 @@ void PointerAnalysis::connectVCallToVFns(const CallICFGNode* cs, const VFunSet &
     {
         const SVFFunction* callee = *fit;
         callee = callee->getDefFunForMultipleModule();
-        if (getIndCallMap()[cs].count(callee) > 0)
+        if (getIndCallMap()[cs].count(callee->getCallGraphNode()) > 0)
             continue;
         if(cs->arg_size() == callee->arg_size() ||
                 (cs->isVarArg() && callee->isVarArg()))
         {
-            newEdges[cs].insert(callee);
-            getIndCallMap()[cs].insert(callee);
+            newEdges[cs].insert(callee->getCallGraphNode());
+            getIndCallMap()[cs].insert(callee->getCallGraphNode());
             const CallICFGNode* callBlockNode = cs;
-            callgraph->addIndirectCallGraphEdge(callBlockNode, cs->getCaller(),callee);
+            callgraph->addIndirectCallGraphEdge(callBlockNode, cs->getCaller(),callee->getCallGraphNode());
         }
     }
 }
