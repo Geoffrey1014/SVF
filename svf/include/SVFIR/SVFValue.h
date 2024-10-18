@@ -307,6 +307,11 @@ public:
     typedef SVFLoopAndDomInfo::BBList BBList;
     typedef SVFLoopAndDomInfo::LoopBBs LoopBBs;
 
+    inline const CallGraphNode* getCallGraphNode() const
+    {
+        return callGraphNode;
+    }
+
 private:
     bool isDecl;   /// return true if this function does not have a body
     bool intrinsic; /// return true if this function is an intrinsic function (e.g., llvm.dbg), which does not reside in the application code
@@ -326,11 +331,6 @@ protected:
     inline void setCallGraphNode(CallGraphNode *cgn)
     {
         callGraphNode = cgn;
-    }
-
-    inline const CallGraphNode* getCallGraphNode()
-    {
-        return callGraphNode;
     }
 
     ///@{ attributes to be set only through Module builders e.g., LLVMModule
