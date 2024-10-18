@@ -81,7 +81,8 @@ CallGraphNode::CallGraphNode(NodeID i, const SVFFunction* f): GenericCallGraphNo
     funcType = f->getFunctionType();
     loopAndDom = f->getLoopAndDomInfo();
     realDefFun = f->getDefFunForMultipleModule();
-    exitBlock = f->getExitBB();
+    if (hasBasicBlock())
+        exitBlock = f->getExitBB();
 }
 
 
