@@ -957,11 +957,11 @@ void VFG::updateCallGraph(PointerAnalysis* pta)
     {
         const CallICFGNode* newcs = iter->first;
         assert(newcs->isIndirectCall() && "this is not an indirect call?");
-        const PointerAnalysis::FunctionSet & functions = iter->second;
+        const PointerAnalysis::FunctionSet& functions = iter->second;
         for (PointerAnalysis::FunctionSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
         {
-            const SVFFunction*  func = *func_iter;
-            connectCallerAndCallee(newcs, func, vfEdgesAtIndCallSite);
+            const CallGraphNode*  func = *func_iter;
+            connectCallerAndCallee(newcs, func->getFunction(), vfEdgesAtIndCallSite);
         }
     }
 }

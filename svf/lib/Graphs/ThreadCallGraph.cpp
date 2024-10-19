@@ -65,7 +65,7 @@ void ThreadCallGraph::updateCallGraph(PointerAnalysis* pta)
         for (CallGraph::FunctionSet::const_iterator func_iter =
                     functions.begin(); func_iter != functions.end(); func_iter++)
         {
-            const SVFFunction* callee = *func_iter;
+            const CallGraphNode* callee = *func_iter;
             this->addIndirectCallGraphEdge(cs, cs->getCaller(), callee);
         }
     }
@@ -85,8 +85,7 @@ void ThreadCallGraph::updateCallGraph(PointerAnalysis* pta)
                     const MemObj* obj = pag->getObject(objPN);
                     if(obj->isFunction())
                     {
-                        const SVFFunction* svfCallee = obj->getCallGraphNode()->getFunction();
-                        this->addIndirectForkEdge(*it, svfCallee);
+                        this->addIndirectForkEdge(*it, obj->getCallGraphNode());
                     }
                 }
             }
@@ -149,10 +148,10 @@ bool ThreadCallGraph::addDirectForkEdge(const CallICFGNode* cs)
 /*!
  * Add indirect fork edge to update call graph
  */
-bool ThreadCallGraph::addIndirectForkEdge(const CallICFGNode* cs, const SVFFunction* calleefun)
+bool ThreadCallGraph::addIndirectForkEdge(const CallICFGNode* cs, const CallGraphNode* calleefun)
 {
     CallGraphNode* caller = getCallGraphNode(cs->getCaller());
-    CallGraphNode* callee = getCallGraphNode(calleefun);
+    CallGraphNode* callee = const_cast<CallGraphNode*>(calleefun);
 
     CallSiteID csId = addCallSite(cs, callee->getFunction());
 

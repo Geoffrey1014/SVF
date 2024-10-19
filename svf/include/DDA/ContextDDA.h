@@ -146,11 +146,11 @@ public:
         for (CallEdgeMap::const_iterator iter = newEdges.begin(),eiter = newEdges.end(); iter != eiter; iter++)
         {
             const CallICFGNode* newcs = iter->first;
-            const FunctionSet & functions = iter->second;
+            const FunctionSet& functions = iter->second;
             for (FunctionSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
             {
-                const SVFFunction*  func = *func_iter;
-                getSVFG()->connectCallerAndCallee(newcs, func, svfgEdges);
+                const CallGraphNode*  func = *func_iter;
+                getSVFG()->connectCallerAndCallee(newcs, func->getFunction(), svfgEdges);
             }
         }
     }

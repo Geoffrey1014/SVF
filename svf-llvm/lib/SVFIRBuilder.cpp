@@ -1204,7 +1204,7 @@ void SVFIRBuilder::updateCallGraph(CallGraph* callgraph)
         {
             const Function* callee = SVFUtil::cast<Function>(llvmModuleSet()->getLLVMValue(*func_iter));
 
-            if (isExtCall(*func_iter))
+            if (isExtCall((*func_iter)->getFunction()))
             {
                 setCurrentLocation(callee, callee->empty() ? nullptr : &callee->getEntryBlock());
                 const SVFFunction* svfcallee = llvmModuleSet()->getSVFFunction(callee);

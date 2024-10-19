@@ -435,7 +435,7 @@ public:
     typedef std::pair<const CallICFGNode*, const SVFFunction*> CallSitePair;
     typedef Map<CallSitePair, CallSiteID> CallSiteToIdMap;
     typedef Map<CallSiteID, CallSitePair> IdToCallSiteMap;
-    typedef Set<const SVFFunction*> FunctionSet;
+    typedef Set<const CallGraphNode*> FunctionSet;
     typedef OrderedMap<const CallICFGNode*, FunctionSet> CallEdgeMap;
     typedef CallGraphEdgeSet::iterator CallGraphEdgeIter;
     typedef CallGraphEdgeSet::const_iterator CallGraphEdgeConstIter;
@@ -592,14 +592,14 @@ public:
     CallGraphEdge* getGraphEdge(CallGraphNode* src, CallGraphNode* dst,CallGraphEdge::CEDGEK kind, CallSiteID csId);
 
     /// Get all callees for a callsite
-    inline void getCallees(const CallICFGNode* cs, FunctionSet& callees) //TODO: hwg
+    inline void getCallees(const CallICFGNode* cs, FunctionSet& callees)
     {
         if(hasCallGraphEdge(cs))
         {
             for (CallGraphEdgeSet::const_iterator it = getCallEdgeBegin(cs), eit =
                         getCallEdgeEnd(cs); it != eit; ++it)
             {
-                callees.insert((*it)->getDstNode()->getFunction());
+                callees.insert((*it)->getDstNode());
             }
         }
     }
@@ -636,7 +636,7 @@ public:
     /// Add direct/indirect call edges
     //@{
     void addDirectCallGraphEdge(const CallICFGNode* call, const SVFFunction* callerFun, const SVFFunction* calleeFun);
-    void addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const SVFFunction* calleeFun);
+    void addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const CallGraphNode* calleeFun);
     //@}
 
     /// Get callsites invoking the callee

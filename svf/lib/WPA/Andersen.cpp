@@ -202,7 +202,7 @@ bool AndersenBase::updateCallGraph(const CallSiteToFunPtrMap& callsites)
                 ecit = it->second.end();
                 cit != ecit; ++cit)
         {
-            connectCaller2CalleeParams(it->first, *cit, cpySrcNodes);
+            connectCaller2CalleeParams(it->first, (*cit)->getFunction(), cpySrcNodes);
         }
     }
 
@@ -232,7 +232,7 @@ bool AndersenBase::updateThreadCallGraph(const CallSiteToFunPtrMap& callsites,
                 ecit = it->second.end();
                 cit != ecit; ++cit)
         {
-            connectCaller2ForkedFunParams(it->first, *cit, cpySrcNodes);
+            connectCaller2ForkedFunParams(it->first,(*cit)->getFunction(), cpySrcNodes);
         }
     }
     return !newForkEdges.empty();

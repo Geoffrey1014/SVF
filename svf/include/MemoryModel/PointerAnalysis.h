@@ -101,7 +101,7 @@ public:
     //@{
     typedef Set<const CallICFGNode*> CallSiteSet;
     typedef SVFIR::CallSiteToFunPtrMap CallSiteToFunPtrMap;
-    typedef Set<const SVFFunction*> FunctionSet;
+    typedef Set<const CallGraphNode*> FunctionSet;
     typedef OrderedMap<const CallICFGNode*, FunctionSet> CallEdgeMap;
     typedef SCCDetection<CallGraph*> CallGraphSCC;
     typedef Set<const SVFGlobalValue*> VTableSet;

@@ -427,15 +427,15 @@ void ICFG::updateCallGraph(CallGraph* callgraph)
         const CallGraph::FunctionSet & functions = iter->second;
         for (CallGraph::FunctionSet::const_iterator func_iter = functions.begin(); func_iter != functions.end(); func_iter++)
         {
-            const SVFFunction*  callee = *func_iter;
+            const CallGraphNode*  callee = *func_iter;
             RetICFGNode* retBlockNode = const_cast<RetICFGNode*>(callBlockNode->getRetICFGNode());
             /// if this is an external function (no function body), connect calleeEntryNode to calleeExitNode
-            if (isExtCall(callee))
+            if (isExtCall(callee->getFunction()))
                 addIntraEdge(callBlockNode, retBlockNode);
             else
             {
-                FunEntryICFGNode* calleeEntryNode = getFunEntryBlock(callee);
-                FunExitICFGNode* calleeExitNode = getFunExitBlock(callee);
+                FunEntryICFGNode* calleeEntryNode = getFunEntryBlock(callee->getFunction());
+                FunExitICFGNode* calleeExitNode = getFunExitBlock(callee->getFunction());
                 if(ICFGEdge* callEdge = addCallEdge(callBlockNode, calleeEntryNode))
                 {
                     for (const SVFStmt *stmt : callBlockNode->getSVFStmts())

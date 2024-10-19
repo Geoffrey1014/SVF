@@ -235,11 +235,11 @@ void CallGraph::addDirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction*
 /*!
  * Add indirect call edge to update call graph
  */
-void CallGraph::addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const SVFFunction* calleeFun)
+void CallGraph::addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const CallGraphNode* calleeFun)
 {
 
     CallGraphNode* caller = getCallGraphNode(callerFun);
-    CallGraphNode* callee = getCallGraphNode(calleeFun);
+    CallGraphNode* callee = getCallGraphNode(calleeFun->getId());
 
     numOfResolvedIndCallEdge++;
 
