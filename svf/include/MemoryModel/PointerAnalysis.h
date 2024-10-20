@@ -400,13 +400,13 @@ public:
     /// Return TRUE if this edge is inside a CallGraph SCC, i.e., src node and dst node are in the same SCC on the SVFG.
     inline bool inSameCallGraphSCC(const SVFFunction* fun1,const SVFFunction* fun2)
     {
-        const CallGraphNode* src = callgraph->getCallGraphNode(fun1);
-        const CallGraphNode* dst = callgraph->getCallGraphNode(fun2);
+        const CallGraphNode* src = callgraph->getSVFIRCallGraphNode(fun1);
+        const CallGraphNode* dst = callgraph->getSVFIRCallGraphNode(fun2);
         return (getCallGraphSCCRepNode(src->getId()) == getCallGraphSCCRepNode(dst->getId()));
     }
     inline bool isInRecursion(const SVFFunction* fun) const
     {
-        return callGraphSCC->isInCycle(callgraph->getCallGraphNode(fun)->getId());
+        return callGraphSCC->isInCycle(callgraph->getSVFIRCallGraphNode(fun)->getId());
     }
     /// Whether a local variable is in function recursions
     bool isLocalVarInRecursiveFun(NodeID id) const;

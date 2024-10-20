@@ -124,10 +124,10 @@ void ThreadCallGraph::updateJoinEdge(PointerAnalysis* pta)
 bool ThreadCallGraph::addDirectForkEdge(const CallICFGNode* cs)
 {
 
-    CallGraphNode* caller = getCallGraphNode(cs->getCaller());
+    CallGraphNode* caller = getSVFIRCallGraphNode(cs->getCaller());
     const SVFFunction* forkee = tdAPI->getForkedFun(cs)->getCallGraphNode()->getFunction();
     assert(forkee && "callee does not exist");
-    CallGraphNode* callee = getCallGraphNode(forkee->getDefFunForMultipleModule());
+    CallGraphNode* callee = getSVFIRCallGraphNode(forkee->getDefFunForMultipleModule());
     CallSiteID csId = addCallSite(cs, callee->getFunction()->getCallGraphNode());
 
     if (!hasGraphEdge(caller, callee, CallGraphEdge::TDForkEdge, csId))
@@ -150,7 +150,7 @@ bool ThreadCallGraph::addDirectForkEdge(const CallICFGNode* cs)
  */
 bool ThreadCallGraph::addIndirectForkEdge(const CallICFGNode* cs, const CallGraphNode* calleefun)
 {
-    CallGraphNode* caller = getCallGraphNode(cs->getCaller());
+    CallGraphNode* caller = getSVFIRCallGraphNode(cs->getCaller());
     CallGraphNode* callee = const_cast<CallGraphNode*>(calleefun);
 
     CallSiteID csId = addCallSite(cs, callee->getFunction()->getCallGraphNode());
@@ -179,14 +179,14 @@ bool ThreadCallGraph::addIndirectForkEdge(const CallICFGNode* cs, const CallGrap
 void ThreadCallGraph::addDirectJoinEdge(const CallICFGNode* cs,const CallSiteSet& forkset)
 {
 
-    CallGraphNode* joinFunNode = getCallGraphNode(cs->getCaller());
+    CallGraphNode* joinFunNode = getSVFIRCallGraphNode(cs->getCaller());
 
     for (CallSiteSet::const_iterator it = forkset.begin(), eit = forkset.end(); it != eit; ++it)
     {
 
         const SVFFunction* threadRoutineFun = tdAPI->getForkedFun(*it)->getCallGraphNode()->getFunction();
         assert(threadRoutineFun && "thread routine function does not exist");
-        CallGraphNode* threadRoutineFunNode = getCallGraphNode(threadRoutineFun);
+        CallGraphNode* threadRoutineFunNode = getSVFIRCallGraphNode(threadRoutineFun);
         CallSiteID csId = addCallSite(cs, threadRoutineFun->getCallGraphNode());
 
         if (!hasThreadJoinEdge(cs,joinFunNode,threadRoutineFunNode, csId))

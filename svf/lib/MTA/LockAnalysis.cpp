@@ -103,7 +103,7 @@ void LockAnalysis::buildCandidateFuncSetforLock()
     for (InstSet::iterator it = locksites.begin(), eit = locksites.end(); it != eit; ++it)
     {
         const SVFFunction* fun=(*it)->getFun();
-        CallGraphNode* cgnode = tcg->getCallGraphNode(fun);
+        CallGraphNode* cgnode = tcg->getSVFIRCallGraphNode(fun);
         if (visited.find(cgnode) == visited.end())
         {
             worklist.push(cgnode);
@@ -113,7 +113,7 @@ void LockAnalysis::buildCandidateFuncSetforLock()
     for (InstSet::iterator it = unlocksites.begin(), eit = unlocksites.end(); it != eit; ++it)
     {
         const SVFFunction* fun = (*it)->getFun();
-        CallGraphNode* cgnode = tcg->getCallGraphNode(fun);
+        CallGraphNode* cgnode = tcg->getSVFIRCallGraphNode(fun);
         if (visited.find(cgnode) == visited.end())
         {
             worklist.push(cgnode);
@@ -271,7 +271,7 @@ void LockAnalysis::collectCxtLock()
     while (!clpList.empty())
     {
         CxtLockProc clp = popFromCTPWorkList();
-        CallGraphNode* cgNode = getTCG()->getCallGraphNode(clp.getProc());
+        CallGraphNode* cgNode = getTCG()->getSVFIRCallGraphNode(clp.getProc());
         // lzh TODO.
         if (!isLockCandidateFun(cgNode->getFunction()))
             continue;
@@ -454,7 +454,7 @@ void LockAnalysis::handleRet(const CxtStmt& cts)
     const ICFGNode* curInst = cts.getStmt();
     const CallStrCxt& curCxt = cts.getContext();
     const SVFFunction* svffun = curInst->getFun();
-    CallGraphNode* curFunNode = getTCG()->getCallGraphNode(svffun);
+    CallGraphNode* curFunNode = getTCG()->getSVFIRCallGraphNode(svffun);
 
     for (CallGraphNode::const_iterator it = curFunNode->getInEdges().begin(), eit = curFunNode->getInEdges().end(); it != eit; ++it)
     {
@@ -525,7 +525,7 @@ void LockAnalysis::pushCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVFF
 //    if (isLockCandidateFun(caller) == false)
 //        return;
 
-    if (tct->inSameCallGraphSCC(getTCG()->getCallGraphNode(svfcaller), getTCG()->getCallGraphNode(callee)) == false)
+    if (tct->inSameCallGraphSCC(getTCG()->getSVFIRCallGraphNode(svfcaller),getTCG()->getSVFIRCallGraphNode(callee)) == false)
     {
         tct->pushCxt(cxt,csId);
         DBOUT(DMTA, tct->dumpCxt(cxt));
@@ -545,7 +545,7 @@ bool LockAnalysis::matchCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVF
     if (cxt.empty())
         return true;
 
-    if (tct->inSameCallGraphSCC(getTCG()->getCallGraphNode(svfcaller), getTCG()->getCallGraphNode(callee)) == false)
+    if (tct->inSameCallGraphSCC(getTCG()->getSVFIRCallGraphNode(svfcaller),getTCG()->getSVFIRCallGraphNode(callee)) == false)
     {
         if (cxt.back() == csId)
             cxt.pop_back();

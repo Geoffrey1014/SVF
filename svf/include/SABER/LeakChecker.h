@@ -81,13 +81,14 @@ public:
     virtual inline bool isSourceLikeFun(const SVFFunction* fun) override
     {
         CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
-        return SaberCheckerAPI::getCheckerAPI()->isMemAlloc(svfirCallGraph->getCallGraphNode(fun));
+        return SaberCheckerAPI::getCheckerAPI()->isMemAlloc(
+            svfirCallGraph->getSVFIRCallGraphNode(fun));
     }
     /// Whether the function is a heap deallocator (free/release memory)
     virtual inline bool isSinkLikeFun(const SVFFunction* fun) override
     {
         CallGraph* svfirCallGraph = PAG::getPAG()->getCallGraph();
-        return SaberCheckerAPI::getCheckerAPI()->isMemDealloc(svfirCallGraph->getCallGraphNode(fun));
+        return SaberCheckerAPI::getCheckerAPI()->isMemDealloc(svfirCallGraph->getSVFIRCallGraphNode(fun));
     }
     //@}
 
