@@ -221,7 +221,7 @@ CallSiteID ContextDDA::getCSIDAtCall(CxtLocDPItem&, const SVFGEdge* edge)
 
     if(getCallGraph()->hasCallSiteID(cbn,callee))
     {
-        return getCallGraph()->getCallSiteID(cbn,callee);
+        return getCallGraph()->getCallSiteID(cbn,callee->getCallGraphNode());
     }
 
     return 0;
@@ -245,7 +245,7 @@ CallSiteID ContextDDA::getCSIDAtRet(CxtLocDPItem&, const SVFGEdge* edge)
 
     if(getCallGraph()->hasCallSiteID(cbn,callee))
     {
-        return getCallGraph()->getCallSiteID(cbn,callee);
+        return getCallGraph()->getCallSiteID(cbn,callee->getCallGraphNode());
     }
 
     return 0;

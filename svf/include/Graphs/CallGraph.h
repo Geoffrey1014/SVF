@@ -435,7 +435,7 @@ public:
     typedef std::pair<const CallICFGNode*, const CallGraphNode*> CallSitePair; // svfir CallGraphNode
     typedef Map<CallSitePair, CallSiteID> CallSiteToIdMap;
     typedef Map<CallSiteID, CallSitePair> IdToCallSiteMap;
-    typedef Set<const CallGraphNode*> FunctionSet;
+    typedef Set<const CallGraphNode*> FunctionSet; // svfir CallGraphNode
     typedef OrderedMap<const CallICFGNode*, FunctionSet> CallEdgeMap;
     typedef CallGraphEdgeSet::iterator CallGraphEdgeIter;
     typedef CallGraphEdgeSet::const_iterator CallGraphEdgeConstIter;
@@ -554,9 +554,9 @@ public:
         }
         return it->second;
     }
-    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const SVFFunction* callee) const
+    inline CallSiteID getCallSiteID(const CallICFGNode* cs, const CallGraphNode* callee) const
     {
-        CallSitePair newCS(std::make_pair(cs, callee->getCallGraphNode()));
+        CallSitePair newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
         assert(it != csToIdMap.end() && "callsite id not found! This maybe a partially resolved callgraph, please check the indCallEdge limit");
         return it->second;
