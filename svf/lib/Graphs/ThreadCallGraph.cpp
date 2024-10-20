@@ -66,7 +66,7 @@ void ThreadCallGraph::updateCallGraph(PointerAnalysis* pta)
                     functions.begin(); func_iter != functions.end(); func_iter++)
         {
             const CallGraphNode* callee = *func_iter;
-            this->addIndirectCallGraphEdge(cs, cs->getCaller(), callee);
+            this->addIndirectCallGraphEdge(cs, cs->getCaller()->getCallGraphNode(), callee);
         }
     }
 

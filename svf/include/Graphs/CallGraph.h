@@ -636,7 +636,7 @@ public:
     /// Add direct/indirect call edges
     //@{
     void addDirectCallGraphEdge(const CallICFGNode* call, const CallGraphNode* callerFun, const CallGraphNode* calleeFun);
-    void addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const CallGraphNode* calleeFun);
+    void addIndirectCallGraphEdge(const CallICFGNode* cs,const CallGraphNode* callerFun, const CallGraphNode* calleeFun);
     //@}
 
     /// Get callsites invoking the callee
