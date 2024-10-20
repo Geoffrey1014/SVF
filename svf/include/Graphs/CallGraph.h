@@ -635,7 +635,7 @@ public:
 
     /// Add direct/indirect call edges
     //@{
-    void addDirectCallGraphEdge(const CallICFGNode* call, const SVFFunction* callerFun, const SVFFunction* calleeFun);
+    void addDirectCallGraphEdge(const CallICFGNode* call, const CallGraphNode* callerFun, const CallGraphNode* calleeFun);
     void addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const CallGraphNode* calleeFun);
     //@}
 

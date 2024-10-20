@@ -49,7 +49,7 @@ CallGraph* CallGraphBuilder::buildSVFIRCallGraph(CallGraph* callgraph)
                     const CallICFGNode* callBlockNode = cast<CallICFGNode>(inst);
                     if(const CallGraphNode* callee = callBlockNode->getCalledFunction())
                     {
-                        callgraph->addDirectCallGraphEdge(callBlockNode,(item.second)->getFunction(),callee->getFunction()); // TODO: hwg
+                        callgraph->addDirectCallGraphEdge(callBlockNode,item.second,callee);
                     }
                 }
             }

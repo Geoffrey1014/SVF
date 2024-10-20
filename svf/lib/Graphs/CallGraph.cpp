@@ -215,13 +215,13 @@ CallGraphEdge* CallGraph::getGraphEdge(CallGraphNode* src, CallGraphNode* dst,Ca
 /*!
  * Add direct call edges
  */
-void CallGraph::addDirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const SVFFunction* calleeFun)
+void CallGraph::addDirectCallGraphEdge(const CallICFGNode* cs,const CallGraphNode* callerFun, const CallGraphNode* calleeFun)
 {
 
-    CallGraphNode* caller = getCallGraphNode(callerFun);
-    CallGraphNode* callee = getCallGraphNode(calleeFun);
+    CallGraphNode* caller = const_cast<CallGraphNode*>(callerFun);
+    CallGraphNode* callee = const_cast<CallGraphNode*>(calleeFun);
 
-    CallSiteID csId = addCallSite(cs, calleeFun->getCallGraphNode());
+    CallSiteID csId = addCallSite(cs, callee);
 
     if(!hasGraphEdge(caller,callee, CallGraphEdge::CallRetEdge,csId))
     {
