@@ -561,9 +561,9 @@ public:
         assert(it != csToIdMap.end() && "callsite id not found! This maybe a partially resolved callgraph, please check the indCallEdge limit");
         return it->second;
     }
-    inline bool hasCallSiteID(const CallICFGNode* cs, const SVFFunction* callee) const
+    inline bool hasCallSiteID(const CallICFGNode* cs, const CallGraphNode* callee) const
     {
-        CallSitePair newCS(std::make_pair(cs, callee->getCallGraphNode()));
+        CallSitePair newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
         return it != csToIdMap.end();
     }
