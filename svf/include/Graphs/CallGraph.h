@@ -540,9 +540,9 @@ public:
 
     /// Add/Get CallSiteID
     //@{
-    inline CallSiteID addCallSite(const CallICFGNode* cs, const SVFFunction* callee)
+    inline CallSiteID addCallSite(const CallICFGNode* cs, const CallGraphNode* callee)
     {
-        std::pair<const CallICFGNode*, const CallGraphNode*> newCS(std::make_pair(cs, callee->getCallGraphNode()));
+        std::pair<const CallICFGNode*, const CallGraphNode*> newCS(std::make_pair(cs, callee));
         CallSiteToIdMap::const_iterator it = csToIdMap.find(newCS);
         //assert(it == csToIdMap.end() && "cannot add a callsite twice");
         if(it == csToIdMap.end())
