@@ -581,9 +581,9 @@ public:
     {
         return getCallSite(id)->getCaller();
     }
-    inline const SVFFunction* getCalleeOfCallSite(CallSiteID id) const
+    inline const CallGraphNode* getCalleeOfCallSite(CallSiteID id) const
     {
-        return getCallSitePair(id).second->getFunction();
+        return getCallSitePair(id).second;
     }
     //@}
     /// Whether we have already created this call graph edge
