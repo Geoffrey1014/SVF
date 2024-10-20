@@ -184,7 +184,7 @@ void MHP::handleNonCandidateFun(const CxtThreadStmt& cts)
     const SVFFunction* curfun = curInst->getFun();
     assert((curInst == curfun->getEntryBlock()->front()) && "curInst is not the entry of non candidate function.");
     const CallStrCxt& curCxt = cts.getContext();
-    CallGraphNode* node = tcg->getCallGraphNode(curfun);
+    CallGraphNode* node = tcg->getSVFIRCallGraphNode(curfun);
     for (CallGraphNode::const_iterator nit = node->OutEdgeBegin(), neit = node->OutEdgeEnd(); nit != neit; nit++)
     {
         const SVFFunction* callee = (*nit)->getDstNode()->getFunction();
@@ -318,7 +318,7 @@ void MHP::handleCall(const CxtThreadStmt& cts, NodeID rootTid)
  */
 void MHP::handleRet(const CxtThreadStmt& cts)
 {
-    CallGraphNode* curFunNode = tcg->getCallGraphNode(cts.getStmt()->getFun());
+    CallGraphNode* curFunNode = tcg->getSVFIRCallGraphNode(cts.getStmt()->getFun());
     for (CallGraphEdge* edge : curFunNode->getInEdges())
     {
         if (SVFUtil::isa<ThreadForkEdge, ThreadJoinEdge>(edge))
@@ -520,7 +520,7 @@ bool MHP::isHBPair(NodeID tid1, NodeID tid2)
 
 bool MHP::isConnectedfromMain(const SVFFunction* fun)
 {
-    CallGraphNode* cgnode = tcg->getCallGraphNode(fun);
+    CallGraphNode* cgnode = tcg->getSVFIRCallGraphNode(fun);
     FIFOWorkList<const CallGraphNode*> worklist;
     TCT::PTACGNodeSet visited;
     worklist.push(cgnode);
@@ -904,7 +904,7 @@ void ForkJoinAnalysis::handleRet(const CxtStmt& cts)
     const ICFGNode* curInst = cts.getStmt();
     const CallStrCxt& curCxt = cts.getContext();
 
-    CallGraphNode* curFunNode = getTCG()->getCallGraphNode(curInst->getFun());
+    CallGraphNode* curFunNode = getTCG()->getSVFIRCallGraphNode(curInst->getFun());
     for (CallGraphEdge* edge : curFunNode->getInEdges())
     {
         if (SVFUtil::isa<ThreadForkEdge, ThreadJoinEdge>(edge))

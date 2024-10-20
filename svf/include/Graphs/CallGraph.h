@@ -529,7 +529,7 @@ public:
     {
         return getGNode(id);
     }
-    inline CallGraphNode* getCallGraphNode(const SVFFunction* fun) const
+    inline CallGraphNode* getSVFIRCallGraphNode(const SVFFunction* fun) const
     {
         FunToCallGraphNodeMap::const_iterator it = funToCallGraphNodeMap.find(fun);
         assert(it!=funToCallGraphNodeMap.end() && "call graph node not found!!");

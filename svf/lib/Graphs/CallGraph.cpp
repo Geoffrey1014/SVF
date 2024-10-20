@@ -238,7 +238,7 @@ void CallGraph::addDirectCallGraphEdge(const CallICFGNode* cs,const CallGraphNod
 void CallGraph::addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunction* callerFun, const CallGraphNode* calleeFun)
 {
 
-    CallGraphNode* caller = getCallGraphNode(callerFun);
+    CallGraphNode* caller = getSVFIRCallGraphNode(callerFun);
     CallGraphNode* callee = getCallGraphNode(calleeFun->getId());
 
     numOfResolvedIndCallEdge++;
@@ -259,7 +259,7 @@ void CallGraph::addIndirectCallGraphEdge(const CallICFGNode* cs,const SVFFunctio
  */
 void CallGraph::getAllCallSitesInvokingCallee(const SVFFunction* callee, CallGraphEdge::CallInstSet& csSet)
 {
-    CallGraphNode* callGraphNode = getCallGraphNode(callee);
+    CallGraphNode* callGraphNode = getSVFIRCallGraphNode(callee);
     for(CallGraphNode::iterator it = callGraphNode->InEdgeBegin(), eit = callGraphNode->InEdgeEnd();
             it!=eit; ++it)
     {
@@ -281,7 +281,7 @@ void CallGraph::getAllCallSitesInvokingCallee(const SVFFunction* callee, CallGra
  */
 void CallGraph::getDirCallSitesInvokingCallee(const SVFFunction* callee, CallGraphEdge::CallInstSet& csSet)
 {
-    CallGraphNode* callGraphNode = getCallGraphNode(callee);
+    CallGraphNode* callGraphNode = getSVFIRCallGraphNode(callee);
     for(CallGraphNode::iterator it = callGraphNode->InEdgeBegin(), eit = callGraphNode->InEdgeEnd();
             it!=eit; ++it)
     {
@@ -298,7 +298,7 @@ void CallGraph::getDirCallSitesInvokingCallee(const SVFFunction* callee, CallGra
  */
 void CallGraph::getIndCallSitesInvokingCallee(const SVFFunction* callee, CallGraphEdge::CallInstSet& csSet)
 {
-    CallGraphNode* callGraphNode = getCallGraphNode(callee);
+    CallGraphNode* callGraphNode = getSVFIRCallGraphNode(callee);
     for(CallGraphNode::iterator it = callGraphNode->InEdgeBegin(), eit = callGraphNode->InEdgeEnd();
             it!=eit; ++it)
     {
@@ -324,7 +324,7 @@ void CallGraph::verifyCallGraph()
         {
             const CallICFGNode* cs = it->first;
             const SVFFunction* func = cs->getCaller();
-            if (getCallGraphNode(func)->isReachableFromProgEntry() == false)
+            if (getSVFIRCallGraphNode(func)->isReachableFromProgEntry() == false)
                 writeWrnMsg(func->getName() + " has indirect call site but not reachable from main");
         }
     }
@@ -335,7 +335,7 @@ void CallGraph::verifyCallGraph()
  */
 bool CallGraph::isReachableBetweenFunctions(const SVFFunction* srcFn, const SVFFunction* dstFn) const
 {
-    CallGraphNode* dstNode = getCallGraphNode(dstFn);
+    CallGraphNode* dstNode = getSVFIRCallGraphNode(dstFn);
 
     std::stack<const CallGraphNode*> nodeStack;
     NodeBS visitedNodes;
