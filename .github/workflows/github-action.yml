@@ -55,27 +55,27 @@ jobs:
       - name: ctest objtype inference
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R objtype -VV
+          ctest -j8 -R objtype -VV
 
       - name: ctest wpa
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R wpa_tests -VV
+          ctest -j8 -R wpa_tests -VV
 
       - name: ctest dvf and mta
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R dvf_tests -VV
+          ctest -j8 -R dvf_tests -VV
 
       - name: ctest andersen differential analysis
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R diff_tests-ander -VV
+          ctest -j8 -R diff_tests-ander -VV
 
       - name: ctest flow-sensitive differential analysis
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R diff_tests-fs -VV
+          ctest -j8 -R diff_tests-fs -VV
 
       - name: ctest Andersen file-write-read
         working-directory: ${{github.workspace}}/Release-build
@@ -85,44 +85,44 @@ jobs:
       - name: ctest mem_leak
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R mem_leak -VV
+          ctest -j8 -R mem_leak -VV
 
       - name: ctest double_free
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R double_free -VV
+          ctest -j8 -R double_free -VV
 
       - name: ctest ae_symabs
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R symabs -VV
+          ctest -j8 -R symabs -VV
 
       - name: ctest ae_assert
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R ae_assert_test -VV
+          ctest -j8 -R ae_assert_test -VV
 
       - name: ctest ae_overflow
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R ae_overflow_test -VV
+          ctest -j8 -R ae_overflow_test -VV
 
       - name: ctest cfl_tests
         working-directory: ${{github.workspace}}/Release-build
         run:
-          ctest -R cfl_tests -VV
+          ctest -j8 -R cfl_tests -VV
 
       - name: ctest performance tests on big cruxbc with file system diff tests
         working-directory: ${{github.workspace}}/Release-build
         if: runner.os == 'Linux' && matrix.sanitizer != 'address'
         run:
-          ctest -R diff-perf-cruxbc-big -VV
+          ctest -j8 -R diff-perf-cruxbc-big -VV
 
       - name: ctest performance tests on small cruxbc with file system diff tests
         working-directory: ${{github.workspace}}/Release-build
         if: runner.os == 'Linux'
         run:
-          ctest -R diff-perf-cruxbc-small -VV
+          ctest -j8 -R diff-perf-cruxbc-small -VV
 
       - name: create-coverage-report-and-remove-system-files
         working-directory: ${{github.workspace}}/Release-build
