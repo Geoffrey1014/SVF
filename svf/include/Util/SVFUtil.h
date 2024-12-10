@@ -280,6 +280,8 @@ inline bool isExtCall(const SVFFunction* fun)
     return fun && ExtAPI::getExtAPI()->is_ext(fun);
 }
 
+bool isExtCall(const CallGraphNode* fun);
+
 inline bool isMemcpyExtFun(const SVFFunction* fun)
 {
     return fun && ExtAPI::getExtAPI()->is_memcpy(fun);
@@ -335,12 +337,7 @@ const SVFFunction* getProgEntryFunction();
 
 /// Return true if this is a program exit function call
 //@{
-inline bool isProgExitFunction (const SVFFunction * fun)
-{
-    return fun && (fun->getName() == "exit" ||
-                   fun->getName() == "__assert_rtn" ||
-                   fun->getName() == "__assert_fail" );
-}
+bool isProgExitFunction (const CallGraphNode * fun);
 
 /// Return true if this argument belongs to an uncalled function
 inline bool isArgOfUncalledFunction(const SVFValue* svfval)
