@@ -525,7 +525,7 @@ void LockAnalysis::handleIntra(const CxtStmt& cts)
 void LockAnalysis::pushCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVFFunction* callee)
 {
     const SVFFunction* svfcaller = call->getFun();
-    CallSiteID csId = getTCG()->getCallSiteID(call, callee);
+    CallSiteID csId = getTCG()->getCallSiteID(call, callee->getCallGraphNode());
 
 //    /// handle calling context for candidate functions only
 //    if (isLockCandidateFun(caller) == false)
@@ -543,7 +543,7 @@ void LockAnalysis::pushCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVFF
 bool LockAnalysis::matchCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVFFunction* callee)
 {
     const SVFFunction* svfcaller = call->getFun();
-    CallSiteID csId = getTCG()->getCallSiteID(call, callee);
+    CallSiteID csId = getTCG()->getCallSiteID(call, callee->getCallGraphNode());
 
 //    /// handle calling context for candidate functions only
 //    if (isLockCandidateFun(caller) == false)
