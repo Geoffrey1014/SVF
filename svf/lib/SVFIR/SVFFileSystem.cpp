@@ -1758,7 +1758,7 @@ void SVFIRReader::readJson(CHGraph* graph)
     F(callNodeToClassesMap);
     F(virtualFunctionToIDMap);
     F(callNodeToCHAVtblsMap);
-    F(callNodeToCHAVFnsMap);
+//    F(callNodeToCHAVFnsMap);
 #undef F
 }
 

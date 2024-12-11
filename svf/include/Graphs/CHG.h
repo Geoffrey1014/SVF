@@ -44,7 +44,7 @@ class SVFModule;
 class CHNode;
 
 typedef Set<const SVFGlobalValue*> VTableSet;
-typedef Set<const SVFFunction*> VFunSet;
+typedef Set<const CallGraphNode*> VFunSet;
 
 /// Common base for class hierarchy graph. Only implements what PointerAnalysis needs.
 class CommonCHGraph

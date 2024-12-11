@@ -535,9 +535,9 @@ void BVDataPTAImpl::onTheFlyThreadCallGraphSolve(const CallSiteToFunPtrMap& call
                         const MemObj *obj = pag->getObject(objPN);
                         if(obj->isFunction())
                         {
-                            const SVFFunction *svfForkedFun = SVFUtil::cast<CallGraphNode>(obj->getGNode())->getFunction();
-                            if(tdCallGraph->addIndirectForkEdge(*it, svfForkedFun))
-                                newForkEdges[*it].insert(svfForkedFun);
+                            const CallGraphNode *cgn = SVFUtil::cast<CallGraphNode>(obj->getGNode());
+                            if(tdCallGraph->addIndirectForkEdge(*it, cgn->getFunction()))
+                                newForkEdges[*it].insert(cgn);
                         }
                     }
                 }
