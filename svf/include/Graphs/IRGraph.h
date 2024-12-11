@@ -149,12 +149,12 @@ public:
         return symInfo->getObjSym(V);
     }
     /// GetReturnNode - Return the unique node representing the return value of a function
-    inline NodeID getReturnNode(const SVFFunction* func) const
+    inline NodeID getReturnNode(const CallGraphNode* func) const
     {
         return symInfo->getRetSym(func);
     }
     /// getVarargNode - Return the unique node representing the variadic argument of a variadic function.
-    inline NodeID getVarargNode(const SVFFunction* func) const
+    inline NodeID getVarargNode(const CallGraphNode* func) const
     {
         return symInfo->getVarargSym(func);
     }

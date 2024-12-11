@@ -116,7 +116,7 @@ SVFIR* SVFIRBuilder::build()
         for (Module::const_iterator F = M.begin(), E = M.end(); F != E; ++F)
         {
             const Function& fun = *F;
-            const SVFFunction* svffun = llvmModuleSet()->getSVFFunction(&fun);
+            const CallGraphNode* cgn = llvmModuleSet()->getCallGraphNode(&fun);
             /// collect return node of function fun
             if(!fun.isDeclaration())
             {
@@ -128,8 +128,8 @@ SVFIR* SVFIRBuilder::build()
                 if (fun.doesNotReturn() == false &&
                         fun.getReturnType()->isVoidTy() == false)
                 {
-                    pag->addFunRet(svffun,
-                                   pag->getGNode(pag->getReturnNode(svffun)));
+                    pag->addFunRet(cgn,
+                                   pag->getGNode(pag->getReturnNode(cgn)));
                 }
 
                 /// To be noted, we do not record arguments which are in declared function without body
@@ -146,7 +146,7 @@ SVFIR* SVFIRBuilder::build()
                     //    if(I->getType()->isPointerTy())
                     //        addBlackHoleAddrEdge(argValNodeId);
                     //}
-                    pag->addFunArgs(svffun,pag->getGNode(argValNodeId));
+                    pag->addFunArgs(cgn,pag->getGNode(argValNodeId));
                 }
             }
             for (Function::const_iterator bit = fun.begin(), ebit = fun.end();

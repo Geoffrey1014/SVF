@@ -353,14 +353,14 @@ void SymbolTableBuilder::collectObj(const Value* val)
  */
 void SymbolTableBuilder::collectRet(const Function* val)
 {
-    const SVFFunction* svffun =
-        LLVMModuleSet::getLLVMModuleSet()->getSVFFunction(val);
+    const CallGraphNode* cgn =
+        LLVMModuleSet::getLLVMModuleSet()->getCallGraphNode(val);
     SymbolTableInfo::FunToIDMapTy::iterator iter =
-        symInfo->returnSymMap.find(svffun);
+        symInfo->returnSymMap.find(cgn);
     if (iter == symInfo->returnSymMap.end())
     {
         SymID id = NodeIDAllocator::get()->allocateValueId();
-        symInfo->returnSymMap.insert(std::make_pair(svffun, id));
+        symInfo->returnSymMap.insert(std::make_pair(cgn, id));
         DBOUT(DMemModel, outs() << "create a return sym " << id << "\n");
     }
 }
@@ -370,14 +370,14 @@ void SymbolTableBuilder::collectRet(const Function* val)
  */
 void SymbolTableBuilder::collectVararg(const Function* val)
 {
-    const SVFFunction* svffun =
-        LLVMModuleSet::getLLVMModuleSet()->getSVFFunction(val);
+    const CallGraphNode* cgn =
+        LLVMModuleSet::getLLVMModuleSet()->getCallGraphNode(val);
     SymbolTableInfo::FunToIDMapTy::iterator iter =
-        symInfo->varargSymMap.find(svffun);
+        symInfo->varargSymMap.find(cgn);
     if (iter == symInfo->varargSymMap.end())
     {
         SymID id = NodeIDAllocator::get()->allocateValueId();
-        symInfo->varargSymMap.insert(std::make_pair(svffun, id));
+        symInfo->varargSymMap.insert(std::make_pair(cgn, id));
         DBOUT(DMemModel, outs() << "create a vararg sym " << id << "\n");
     }
 }

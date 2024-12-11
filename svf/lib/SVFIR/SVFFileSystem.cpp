@@ -1367,10 +1367,10 @@ SVFIR* SVFIRReader::read(const cJSON* root)
     F(memToFieldsMap);
     F(globSVFStmtSet);
     F(phiNodeMap);
-    F(funArgsListMap);
+//    F(funArgsListMap);
     F(callSiteArgsListMap);
     F(callSiteRetMap);
-    F(funRetMap);
+//    F(funRetMap);
     F(indCallSiteToFunPtrMap);
     F(funPtrToCallSitesMap);
     F(candidatePointers);
@@ -1694,8 +1694,8 @@ void SVFIRReader::readJson(SymbolTableInfo* symTabInfo)
     // `allMemObj` was consumed during create & fill phase.
     F(valSymMap);
     F(objSymMap);
-    F(returnSymMap);
-    F(varargSymMap);
+//    F(returnSymMap);
+//    F(varargSymMap);
     symTableReader.memObjMap.saveToIDToObjMap(symTabInfo->objMap); // objMap
     F(modelConstants);
     F(totalSymNum);

@@ -73,7 +73,7 @@ public:
     /// sym id to memory object map
     typedef OrderedMap<SymID, MemObj*> IDToMemMapTy;
     /// function to sym id map
-    typedef OrderedMap<const SVFFunction*, SymID> FunToIDMapTy;
+    typedef OrderedMap<const CallGraphNode*, SymID> FunToIDMapTy;
     /// struct type to struct info map
     typedef Set<const SVFType*> SVFTypeSet;
     //@}
@@ -227,14 +227,14 @@ public:
         return iter->second;
     }
 
-    inline SymID getRetSym(const SVFFunction* val) const
+    inline SymID getRetSym(const CallGraphNode* val) const
     {
         FunToIDMapTy::const_iterator iter =  returnSymMap.find(val);
         assert(iter!=returnSymMap.end() && "ret sym not found");
         return iter->second;
     }
 
-    inline SymID getVarargSym(const SVFFunction* val) const
+    inline SymID getVarargSym(const CallGraphNode* val) const
     {
         FunToIDMapTy::const_iterator iter =  varargSymMap.find(val);
         assert(iter!=varargSymMap.end() && "vararg sym not found");
