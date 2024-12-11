@@ -1736,8 +1736,8 @@ void SVFIRReader::readJson(ICFG* icfg)
     const cJSON* obj = icfgReader.getFieldJson();
 #define F(field) JSON_READ_FIELD_FWD(obj, icfg, field)
     F(totalICFGNode);
-    F(FunToFunEntryNodeMap);
-    F(FunToFunExitNodeMap);
+//    F(FunToFunEntryNodeMap);
+//    F(FunToFunExitNodeMap);
     F(globalBlockNode);
     F(icfgNodeToSVFLoopVec);
 #undef F
