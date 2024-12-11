@@ -103,7 +103,8 @@ void LockAnalysis::buildCandidateFuncSetforLock()
     for (InstSet::iterator it = locksites.begin(), eit = locksites.end(); it != eit; ++it)
     {
         const SVFFunction* fun=(*it)->getFun();
-        PTACallGraphNode* cgnode = tcg->getCallGraphNode(fun->getCallGraphNode());
+        PTACallGraphNode* cgnode =
+            tcg->getPTACallGraphNode(fun->getCallGraphNode());
         if (visited.find(cgnode) == visited.end())
         {
             worklist.push(cgnode);
@@ -113,7 +114,8 @@ void LockAnalysis::buildCandidateFuncSetforLock()
     for (InstSet::iterator it = unlocksites.begin(), eit = unlocksites.end(); it != eit; ++it)
     {
         const SVFFunction* fun = (*it)->getFun();
-        PTACallGraphNode* cgnode = tcg->getCallGraphNode(fun->getCallGraphNode());
+        PTACallGraphNode* cgnode =
+            tcg->getPTACallGraphNode(fun->getCallGraphNode());
         if (visited.find(cgnode) == visited.end())
         {
             worklist.push(cgnode);
@@ -271,7 +273,8 @@ void LockAnalysis::collectCxtLock()
     while (!clpList.empty())
     {
         CxtLockProc clp = popFromCTPWorkList();
-        PTACallGraphNode* cgNode = getTCG()->getCallGraphNode(clp.getProc()->getCallGraphNode());
+        PTACallGraphNode* cgNode =
+            getTCG()->getPTACallGraphNode(clp.getProc()->getCallGraphNode());
         // lzh TODO.
         if (!isLockCandidateFun(cgNode->getCallNode()->getFunction()))
             continue;
@@ -454,7 +457,8 @@ void LockAnalysis::handleRet(const CxtStmt& cts)
     const ICFGNode* curInst = cts.getStmt();
     const CallStrCxt& curCxt = cts.getContext();
     const SVFFunction* svffun = curInst->getFun();
-    PTACallGraphNode* curFunNode = getTCG()->getCallGraphNode(svffun->getCallGraphNode());
+    PTACallGraphNode* curFunNode =
+        getTCG()->getPTACallGraphNode(svffun->getCallGraphNode());
 
     for (PTACallGraphNode::const_iterator it = curFunNode->getInEdges().begin(), eit = curFunNode->getInEdges().end(); it != eit; ++it)
     {
@@ -527,7 +531,9 @@ void LockAnalysis::pushCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVFF
 //    if (isLockCandidateFun(caller) == false)
 //        return;
 
-    if (tct->inSameCallGraphSCC(getTCG()->getCallGraphNode(svfcaller->getCallGraphNode()), getTCG()->getCallGraphNode(callee->getCallGraphNode())) == false)
+    if (tct->inSameCallGraphSCC(
+            getTCG()->getPTACallGraphNode(svfcaller->getCallGraphNode()),
+            getTCG()->getPTACallGraphNode(callee->getCallGraphNode())) == false)
     {
         tct->pushCxt(cxt,csId);
         DBOUT(DMTA, tct->dumpCxt(cxt));
@@ -547,7 +553,9 @@ bool LockAnalysis::matchCxt(CallStrCxt& cxt, const CallICFGNode* call, const SVF
     if (cxt.empty())
         return true;
 
-    if (tct->inSameCallGraphSCC(getTCG()->getCallGraphNode(svfcaller->getCallGraphNode()), getTCG()->getCallGraphNode(callee->getCallGraphNode())) == false)
+    if (tct->inSameCallGraphSCC(
+            getTCG()->getPTACallGraphNode(svfcaller->getCallGraphNode()),
+            getTCG()->getPTACallGraphNode(callee->getCallGraphNode())) == false)
     {
         if (cxt.back() == csId)
             cxt.pop_back();
