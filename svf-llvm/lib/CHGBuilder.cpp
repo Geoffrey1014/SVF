@@ -540,7 +540,7 @@ void CHGBuilder::analyzeVTables(const Module &M)
                     {
                         for (int i = 0; i < null_ptr_num; ++i)
                         {
-                            const SVFFunction* fun = virtualFunctions[i];
+                            const CallGraphNode* fun = virtualFunctions[i];
                             virtualFunctions.insert(virtualFunctions.begin(), fun);
                         }
                     }
@@ -608,7 +608,7 @@ void CHGBuilder::buildVirtualFunctionToIDMap()
         /*
          * get all virtual functions in a specific group
          */
-        set<const SVFFunction*> virtualFunctions;
+        set<const CallGraphNode*> virtualFunctions;
         for (CHGraph::CHNodeSetTy::iterator it = group.begin(),
                 eit = group.end(); it != eit; ++it)
         {
@@ -616,7 +616,7 @@ void CHGBuilder::buildVirtualFunctionToIDMap()
             for (vector<CHNode::FuncVector>::const_iterator vit = vecs.begin(),
                     veit = vecs.end(); vit != veit; ++vit)
             {
-                for (vector<const SVFFunction*>::const_iterator fit = (*vit).begin(),
+                for (vector<const CallGraphNode*>::const_iterator fit = (*vit).begin(),
                         feit = (*vit).end(); fit != feit; ++fit)
                 {
                     virtualFunctions.insert(*fit);
@@ -639,15 +639,15 @@ void CHGBuilder::buildVirtualFunctionToIDMap()
          * <~C, C::~C>
          * ...
          */
-        set<pair<string, const SVFFunction*> > fNameSet;
-        for (set<const SVFFunction*>::iterator fit = virtualFunctions.begin(),
+        set<pair<string, const CallGraphNode*> > fNameSet;
+        for (set<const CallGraphNode*>::iterator fit = virtualFunctions.begin(),
                 feit = virtualFunctions.end(); fit != feit; ++fit)
         {
-            const SVFFunction* f = *fit;
+            const CallGraphNode* f = *fit;
             struct DemangledName dname = demangle(f->getName());
-            fNameSet.insert(pair<string, const SVFFunction*>(dname.funcName, f));
+            fNameSet.insert(pair<string, const CallGraphNode*>(dname.funcName, f));
         }
-        for (set<pair<string, const SVFFunction*>>::iterator it = fNameSet.begin(),
+        for (set<pair<string, const CallGraphNode*>>::iterator it = fNameSet.begin(),
                 eit = fNameSet.end(); it != eit; ++it)
         {
             chg->virtualFunctionToIDMap[it->second] = chg->vfID++;
@@ -743,15 +743,15 @@ void CHGBuilder::addFuncToFuncVector(CHNode::FuncVector &v, const Function *lf)
     {
         if (const auto* tf = cppUtil::getThunkTarget(lf))
         {
-            SVFFunction* pFunction =
-                llvmModuleSet()->getSVFFunction(tf);
+            CallGraphNode* pFunction =
+                llvmModuleSet()->getCallGraphNode(tf);
             v.push_back(pFunction);
         }
     }
     else
     {
-        SVFFunction* pFunction =
-            llvmModuleSet()->getSVFFunction(lf);
+        CallGraphNode* pFunction =
+            llvmModuleSet()->getCallGraphNode(lf);
         v.push_back(pFunction);
     }
 }

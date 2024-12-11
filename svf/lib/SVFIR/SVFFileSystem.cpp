@@ -1756,7 +1756,7 @@ void SVFIRReader::readJson(CHGraph* graph)
     F(classNameToInstAndDescsMap);
     F(templateNameToInstancesMap);
     F(callNodeToClassesMap);
-    F(virtualFunctionToIDMap);
+//    F(virtualFunctionToIDMap);
     F(callNodeToCHAVtblsMap);
 //    F(callNodeToCHAVFnsMap);
 #undef F
@@ -2275,7 +2275,7 @@ void SVFIRReader::virtFill(const cJSON*& fieldJson, CHNode* node)
     JSON_READ_FIELD_FWD(fieldJson, node, vtable);
     JSON_READ_FIELD_FWD(fieldJson, node, className);
     JSON_READ_FIELD_FWD(fieldJson, node, flags);
-    JSON_READ_FIELD_FWD(fieldJson, node, virtualFunctionVectors);
+//    JSON_READ_FIELD_FWD(fieldJson, node, virtualFunctionVectors);
 }
 
 void SVFIRReader::virtFill(const cJSON*& fieldJson, CHEdge* edge)
