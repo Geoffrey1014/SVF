@@ -691,7 +691,7 @@ const std::string SVFBaseNode::valueOnlyToString() const
     llvm::raw_string_ostream rawstr(str);
     if (const SVF::PTACallGraphNode* fun = SVFUtil::dyn_cast<PTACallGraphNode>(this))
     {
-        rawstr << "Function: " << fun->getFunction()->getName() << " ";
+        rawstr << "Function: " << fun->getCallNode()->getName() << " ";
     }
     else
     {
