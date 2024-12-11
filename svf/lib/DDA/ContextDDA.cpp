@@ -359,7 +359,7 @@ bool ContextDDA::isHeapCondMemObj(const CxtVar& var, const StoreSVFGNode*)
             if (const auto& node =
                         SVFUtil::dyn_cast<ICFGNode>(gNode))
             {
-                const SVFFunction* svfFun = node->getFun();
+                const CallGraphNode* svfFun = node->getFun();
                 if(_ander->isInRecursion(svfFun))
                     return true;
                 if(var.get_cond().isConcreteCxt() == false)

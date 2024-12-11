@@ -2168,7 +2168,7 @@ void SVFIRReader::virtFill(const cJSON*& fieldJson, ICFGNode* node)
 void SVFIRReader::fill(const cJSON*& fieldJson, ICFGNode* node)
 {
     fill(fieldJson, static_cast<GenericICFGNodeTy*>(node));
-    JSON_READ_FIELD_FWD(fieldJson, node, fun);
+//    JSON_READ_FIELD_FWD(fieldJson, node, fun);
     JSON_READ_FIELD_FWD(fieldJson, node, bb);
     // Skip VFGNodes as it is empty
     JSON_READ_FIELD_FWD(fieldJson, node, pagEdges);
